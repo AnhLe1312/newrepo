@@ -7,8 +7,124 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+/* ─── ALBRA SANS TRIAL — @font-face ─────────────────────────────
+   Folder structure:
+   your-project/
+     index.html
+     AlbraTRIAL/
+       AlbraSansTRIAL-Light.otf
+       AlbraSansTRIAL-Light-Italic.otf
+       AlbraSansTRIAL-Regular.otf
+       AlbraSansTRIAL-Regular-Italic.otf  (named: AlbraSansTRIAL-Regular-Italic or Italic)
+       AlbraSansTRIAL-Medium.otf
+       AlbraSansTRIAL-Medium-Italic.otf
+       AlbraSansTRIAL-Semi.otf
+       AlbraSansTRIAL-Semi-Italic.otf
+       AlbraSansTRIAL-Bold.otf
+       AlbraSansTRIAL-Bold-Italic.otf
+       AlbraSansTRIAL-Black.otf
+       AlbraSansTRIAL-Black-Italic.otf
+   ──────────────────────────────────────────────────────────────── */
+
+/* Light 300 */
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Light-Italic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Regular 400 */
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Regular-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Medium 500 */
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Medium-Italic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* SemiBold 600 */
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Semi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Semi-Italic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Bold 700 */
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Bold-Italic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Black 900 */
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Albra Sans';
+  src: url('AlbraTRIAL/AlbraSansTRIAL-Black-Italic.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+</style>
+<style>
 /* ─── BRAND TOKENS — Souls Lab Brand Guideline 2025 ───────────────
-   Primary font: SVN-Albra Sans → Cormorant Garamond (web fallback)
+   Primary font: Albra Sans (AlbraTRIAL folder) → Cormorant Garamond (web fallback)
    Secondary font: Helvetica Neue → Inter (web fallback)
    ────────────────────────────────────────────────────────────────── */
 :root {
@@ -26,7 +142,7 @@
   --muted:     rgba(26,8,8,0.48);
   --dimmer:    rgba(26,8,8,0.24);
   /* Fonts */
-  --serif: 'Cormorant Garamond', Georgia, serif;
+  --serif: 'Albra Sans', 'Cormorant Garamond', Georgia, serif;
   --sans:  'Inter', 'Helvetica Neue', Helvetica, sans-serif;
   --mono:  'Space Mono', monospace;
 }
@@ -127,9 +243,9 @@ nav.dark-nav .nav-drop .drop-label{color:rgba(235,226,217,0.22);}
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 52px 56px;position:relative;overflow:hidden;}
 .hero-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 68% 35%,rgba(114,6,6,0.08) 0%,transparent 55%),radial-gradient(ellipse at 15% 80%,rgba(114,6,6,0.04) 0%,transparent 45%);}
 .hero-counter{position:absolute;right:52px;bottom:56px;font-family:var(--mono);font-size:10px;color:var(--dimmer);letter-spacing:.12em;writing-mode:vertical-rl;}
-.hero-h1{font-family:var(--serif);font-size:clamp(68px,10.5vw,172px);font-weight:400;line-height:.97;letter-spacing:-.03em;margin-bottom:clamp(24px,3vw,48px);}
+.hero-h1{font-family:var(--serif);font-size:clamp(52px,8vw,132px);font-weight:400;line-height:1.0;letter-spacing:-.03em;margin-bottom:clamp(24px,3vw,48px);}
 .hero-h1 .l1{display:block;color:var(--text);}
-.hero-h1 .l2{display:block;font-style:italic;color:var(--fire);font-size:clamp(62px,9.5vw,156px);}
+.hero-h1 .l2{display:block;font-style:italic;color:var(--fire);font-size:clamp(48px,7.5vw,124px);}
 .hero-row{display:flex;align-items:flex-end;gap:80px;}
 .hero-desc{font-size:15px;line-height:1.76;color:var(--muted);max-width:380px;}
 .hero-actions{display:flex;gap:40px;align-items:center;flex-shrink:0;}
@@ -528,8 +644,8 @@ footer{padding:80px 52px 48px;border-top:1px solid rgba(114,6,6,0.1);background:
 
   /* Layout */
   .hero,.manifesto,.section,.cta-strip,footer{padding-left:24px;padding-right:24px;}
-  .hero-h1{font-size:clamp(52px,10vw,108px);}
-  .hero-row{flex-direction:column;gap:28px;align-items:flex-start;}
+  .hero-h1{font-size:clamp(42px,8vw,88px);}
+  .hero-h1 .l2{font-size:clamp(38px,7vw,80px);}  .hero-row{flex-direction:column;gap:28px;align-items:flex-start;}
   .col2{grid-template-columns:1fr;gap:40px;margin-top:40px;}
   .col3,.col4{grid-template-columns:1fr;}
   .program-grid{grid-template-columns:1fr 1fr;}
@@ -547,8 +663,8 @@ footer{padding:80px 52px 48px;border-top:1px solid rgba(114,6,6,0.1);background:
   .hero,.manifesto,.section,.cta-strip,footer{padding-left:20px;padding-right:20px;}
   .stats-bar{flex-direction:column;}
   .program-grid{grid-template-columns:1fr;}
-  .hero-h1{font-size:clamp(46px,13vw,68px);}
-  .hero-h1 .l2{font-size:clamp(40px,11vw,60px);}
+  .hero-h1{font-size:clamp(36px,11vw,56px);}
+  .hero-h1 .l2{font-size:clamp(32px,9.5vw,50px);}
   .svc-cards-grid{grid-template-columns:1fr;}
   .svc-card{padding:32px 24px;}
   .cta-btns{flex-direction:column;align-items:stretch;}
