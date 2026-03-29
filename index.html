@@ -1,0 +1,2997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Souls Lab — Narrative Design Thinking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ─── BRAND TOKENS — Souls Lab Brand Guideline 2025 ───────────────
+   Primary font: SVN-Albra Sans → Cormorant Garamond (web fallback)
+   Secondary font: Helvetica Neue → Inter (web fallback)
+   ────────────────────────────────────────────────────────────────── */
+:root {
+  /* Master Brand — Narrative Red System */
+  --fire:      #720606;   /* The Fire of Narrative — primary */
+  --energy:    #b5100a;   /* Creative Energy — secondary */
+  --depth:     #ebe2d9;   /* Depth of Story — background */
+  --strategic: #440808;   /* Strategic Depth — dark surfaces */
+  --found:     #040406;   /* Foundation Dark — deepest */
+  /* SoulsU — Knowledge Gold System */
+  --gold:      #c5a25d;
+  --gold-dark: #1f1616;
+  /* Text */
+  --text:      #1a0808;
+  --muted:     rgba(26,8,8,0.48);
+  --dimmer:    rgba(26,8,8,0.24);
+  /* Fonts */
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+  --mono:  'Space Mono', monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--depth);color:var(--text);font-family:var(--sans);overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{background:none;border:none;cursor:none;font:inherit;color:inherit;padding:0;}
+
+/* CURSOR */
+#cur{position:fixed;width:8px;height:8px;background:var(--fire);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cur-ring{position:fixed;width:34px;height:34px;border:1px solid rgba(114,6,6,0.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .35s ease;}
+
+/* GRID */
+.grid-overlay{position:fixed;inset:0;pointer-events:none;z-index:0;display:grid;grid-template-columns:repeat(12,1fr);}
+.grid-overlay span{border-right:1px solid rgba(114,6,6,0.04);height:100vh;}
+
+/* PAGES */
+.page{display:none;position:relative;z-index:1;min-height:100vh;}
+.page.active{display:block;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:22px 52px;transition:background .4s,backdrop-filter .4s;background:rgba(235,226,217,0.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(114,6,6,0.07);}
+nav.dark-nav{background:rgba(4,4,6,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(235,226,217,0.06);}
+nav.dark-nav .nav-logo{color:var(--depth);}
+nav.dark-nav .nav-item > a{color:rgba(235,226,217,0.42);}
+nav.dark-nav .nav-item > a:hover{color:var(--depth);}
+nav.dark-nav .nav-item.has-drop > a::after{border-color:rgba(235,226,217,0.35);}
+nav.dark-nav .nav-item > a.active-link{color:var(--depth);}
+nav.dark-nav .nav-cta{color:var(--energy);border-color:rgba(181,16,10,0.5);}
+nav.dark-nav .nav-cta:hover{background:var(--energy);color:var(--depth);}
+nav.dark-nav .nav-drop{background:var(--found);border-color:rgba(235,226,217,0.08);}
+nav.dark-nav .nav-drop a{color:rgba(235,226,217,0.55);}
+nav.dark-nav .nav-drop a:hover{color:var(--depth);background:rgba(235,226,217,0.06);}
+nav.dark-nav .nav-drop .drop-label{color:rgba(235,226,217,0.25);}
+
+.nav-logo{font-family:var(--serif);font-size:18px;font-weight:400;letter-spacing:-.01em;cursor:pointer;color:var(--text);}
+
+/* Nav links list */
+.nav-links{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:8px;list-style:none;align-items:center;}
+.nav-item{position:relative;}
+.nav-item > a{font-size:11px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s;position:relative;padding:6px 10px;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.nav-item > a:hover{color:var(--text);}
+.nav-item > a.active-link{color:var(--fire);}
+.nav-item > a.active-link::before{content:'';position:absolute;bottom:0;left:10px;right:10px;height:1px;background:var(--fire);}
+
+/* Dropdown chevron */
+.nav-item.has-drop > a::after{content:'';display:inline-block;width:5px;height:5px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg) translateY(-2px);opacity:0.5;transition:transform .2s;}
+.nav-item.has-drop.drop-open > a::after{transform:rotate(-135deg) translateY(-2px);}
+
+/* Dropdown panel — no gap, bridge via padding-top */
+.nav-drop{
+  position:absolute;
+  top:100%;               /* flush to bottom of nav-item */
+  left:50%;
+  transform:translateX(-50%) translateY(4px);
+  min-width:220px;
+  background:var(--depth);
+  border:1px solid rgba(114,6,6,0.1);
+  box-shadow:0 8px 32px rgba(114,6,6,0.08);
+  padding:8px 0 10px;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease, visibility .18s;
+  /* invisible bridge fills any sub-pixel gap */
+}
+/* Invisible top bridge — extends hover zone upward by 8px */
+.nav-drop::before{
+  content:'';
+  position:absolute;
+  top:-8px; left:0; right:0;
+  height:8px;
+  background:transparent;
+}
+.nav-item.has-drop.drop-open .nav-drop{
+  opacity:1;
+  visibility:visible;
+  pointer-events:all;
+  transform:translateX(-50%) translateY(0);
+}
+.nav-drop .drop-label{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);padding:10px 18px 4px;display:block;}
+.nav-drop a{display:block;font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--text);padding:10px 18px;cursor:pointer;transition:background .12s,color .12s;white-space:nowrap;}
+.nav-drop a:hover{background:rgba(114,6,6,0.06);color:var(--fire);}
+.nav-drop a.active-link{color:var(--fire);}
+.nav-drop hr{border:none;border-top:1px solid rgba(114,6,6,0.08);margin:6px 0;}
+
+/* Dark nav dropdown */
+nav.dark-nav .nav-drop{background:var(--found);border-color:rgba(235,226,217,0.08);}
+nav.dark-nav .nav-drop a{color:rgba(235,226,217,0.6);}
+nav.dark-nav .nav-drop a:hover{color:var(--depth);background:rgba(235,226,217,0.06);}
+nav.dark-nav .nav-drop .drop-label{color:rgba(235,226,217,0.22);}
+
+.nav-cta{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--fire);cursor:pointer;border:1px solid var(--fire);padding:9px 22px;background:transparent;transition:all .2s;white-space:nowrap;}
+.nav-cta:hover{background:var(--fire);color:var(--depth);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 52px 56px;position:relative;overflow:hidden;}
+.hero-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 68% 35%,rgba(114,6,6,0.08) 0%,transparent 55%),radial-gradient(ellipse at 15% 80%,rgba(114,6,6,0.04) 0%,transparent 45%);}
+.hero-counter{position:absolute;right:52px;bottom:56px;font-family:var(--mono);font-size:10px;color:var(--dimmer);letter-spacing:.12em;writing-mode:vertical-rl;}
+.hero-h1{font-family:var(--serif);font-size:clamp(68px,10.5vw,172px);font-weight:400;line-height:.97;letter-spacing:-.03em;margin-bottom:clamp(24px,3vw,48px);}
+.hero-h1 .l1{display:block;color:var(--text);}
+.hero-h1 .l2{display:block;font-style:italic;color:var(--fire);font-size:clamp(62px,9.5vw,156px);}
+.hero-row{display:flex;align-items:flex-end;gap:80px;}
+.hero-desc{font-size:15px;line-height:1.76;color:var(--muted);max-width:380px;}
+.hero-actions{display:flex;gap:40px;align-items:center;flex-shrink:0;}
+.btn-arrow{font-size:13px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;transition:gap .2s,color .2s;}
+.btn-arrow:hover{gap:16px;color:var(--fire);}
+.btn-arrow .a{color:var(--fire);}
+.btn-label{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s;}
+.btn-label:hover{color:var(--fire);}
+
+/* STATS */
+.stats-bar{display:flex;border-top:1px solid rgba(114,6,6,0.1);margin-top:64px;}
+.stat{flex:1;padding:32px 0 20px;border-right:1px solid rgba(114,6,6,0.07);}
+.stat:last-child{border-right:none;}
+.stat-n{font-family:var(--serif);font-size:clamp(38px,4.5vw,68px);font-weight:400;line-height:1;color:var(--fire);letter-spacing:-.02em;}
+.stat-lbl{font-size:10px;color:var(--dimmer);letter-spacing:.1em;text-transform:uppercase;margin-top:10px;}
+
+/* SECTIONS */
+.section{padding:120px 52px;position:relative;z-index:1;}
+.bg-cream{background:var(--depth);}
+.bg-paper{background:#e0d5c3;}
+.bg-ink{background:var(--found);color:var(--depth);}
+.bg-red{background:var(--fire);color:var(--depth);}
+.bg-maroon{background:var(--strategic);color:var(--depth);}
+
+/* EYEBROW */
+.s-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--fire);margin-bottom:28px;display:flex;align-items:center;gap:14px;}
+.s-eyebrow::before{content:'';width:28px;height:1px;background:var(--fire);}
+.bg-ink .s-eyebrow,.bg-red .s-eyebrow,.bg-maroon .s-eyebrow{color:rgba(235,226,217,0.5);}
+.bg-ink .s-eyebrow::before,.bg-red .s-eyebrow::before,.bg-maroon .s-eyebrow::before{background:rgba(235,226,217,0.3);}
+
+/* HEADINGS */
+.s-h2{font-family:var(--serif);font-size:clamp(36px,5.5vw,82px);font-weight:400;line-height:1.04;letter-spacing:-.03em;color:var(--text);}
+.s-h2 em{font-style:italic;color:var(--fire);}
+.bg-ink .s-h2{color:var(--depth);}
+.bg-ink .s-h2 em{color:var(--gold);}
+.bg-red .s-h2{color:var(--depth);}
+.bg-red .s-h2 em{color:rgba(235,226,217,0.65);font-style:italic;}
+.bg-maroon .s-h2{color:var(--depth);}
+.bg-maroon .s-h2 em{color:var(--gold);}
+
+.s-body{font-size:15px;line-height:1.82;color:var(--muted);}
+.bg-ink .s-body{color:rgba(235,226,217,0.5);}
+.bg-red .s-body{color:rgba(235,226,217,0.8);}
+.s-body p+p{margin-top:20px;}
+
+/* LAYOUT */
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start;margin-top:72px;}
+.col3{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px;}
+.col4{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:64px;}
+hr.div{border:none;border-top:1px solid rgba(114,6,6,0.1);margin:0;}
+
+/* NDT STEPS */
+.ndt-step{display:grid;grid-template-columns:64px 1fr;gap:32px;padding:36px 0;border-top:1px solid rgba(114,6,6,0.1);transition:border-color .3s;cursor:default;}
+.ndt-step:hover{border-top-color:var(--fire);}
+.step-n{font-family:var(--serif);font-size:52px;font-weight:300;color:rgba(114,6,6,0.1);line-height:1;transition:color .3s;}
+.ndt-step:hover .step-n{color:var(--fire);}
+.step-content h3{font-family:var(--serif);font-size:22px;font-weight:500;margin-bottom:12px;letter-spacing:-.01em;color:var(--text);}
+.step-content p{font-size:14px;line-height:1.76;color:var(--muted);}
+
+/* SERVICE LIST */
+.svc{display:grid;grid-template-columns:1fr auto;align-items:center;padding:44px 0;border-bottom:1px solid rgba(114,6,6,0.1);cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.svc:first-child{border-top:1px solid rgba(114,6,6,0.1);}
+.svc::before{content:'';position:absolute;inset:0;background:var(--fire);opacity:0;transition:opacity .4s;}
+.svc:hover::before{opacity:.04;}
+.svc-l{display:flex;align-items:baseline;gap:32px;position:relative;}
+.svc-num{font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:.12em;flex-shrink:0;}
+.svc-title{font-family:var(--serif);font-size:clamp(24px,3vw,50px);font-weight:400;letter-spacing:-.02em;line-height:1.1;transition:color .2s;color:var(--text);}
+.svc:hover .svc-title{color:var(--fire);}
+.svc-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.svc-tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);border:1px solid rgba(114,6,6,0.12);padding:4px 10px;}
+.svc-arr{font-size:26px;color:var(--fire);opacity:0;transform:translateX(-10px);transition:all .3s;position:relative;}
+.svc:hover .svc-arr{opacity:1;transform:translateX(0);}
+
+/* AUDIENCE CARDS */
+.aud{background:rgba(114,6,6,0.04);padding:52px 40px;border-top:2px solid transparent;transition:all .3s;}
+.aud:hover{background:rgba(114,6,6,0.08);border-top-color:var(--fire);}
+.aud-tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fire);margin-bottom:28px;}
+.aud-title{font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;margin-bottom:16px;line-height:1.1;color:var(--text);}
+.aud-body{font-size:13px;line-height:1.78;color:var(--muted);}
+.aud-link{display:inline-flex;align-items:center;gap:8px;margin-top:28px;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--fire);cursor:pointer;transition:gap .2s;}
+.aud-link:hover{gap:14px;}
+
+/* FEATURE CARDS */
+.fc{background:rgba(114,6,6,0.04);padding:40px 32px;border-left:2px solid transparent;transition:border-color .3s,background .3s;}
+.fc:hover{border-left-color:var(--fire);background:rgba(114,6,6,0.08);}
+.fc h3{font-family:var(--serif);font-size:20px;font-weight:500;margin-bottom:13px;letter-spacing:-.01em;color:var(--text);}
+.fc p{font-size:13px;line-height:1.76;color:var(--muted);}
+.bg-ink .fc{background:rgba(235,226,217,0.05);}
+.bg-ink .fc:hover{background:rgba(235,226,217,0.09);border-left-color:var(--gold);}
+.bg-ink .fc h3{color:var(--depth);}
+.bg-ink .fc p{color:rgba(235,226,217,0.5);}
+
+/* PROOF CARDS */
+.proof-card{background:rgba(235,226,217,0.04);padding:44px 32px;border-top:1px solid rgba(235,226,217,0.1);transition:border-top-color .3s;}
+.proof-card:hover{border-top-color:var(--energy);}
+.proof-n{font-family:var(--mono);font-size:10px;color:rgba(235,226,217,0.35);letter-spacing:.14em;margin-bottom:20px;}
+.proof-title{font-family:var(--serif);font-size:20px;font-weight:500;margin-bottom:14px;letter-spacing:-.01em;color:var(--depth);}
+.proof-body{font-size:13px;line-height:1.76;color:rgba(235,226,217,0.5);}
+.proof-card.hi{background:rgba(181,16,10,0.18);border-top-color:var(--energy);}
+
+/* DATA BOX */
+.data-box{background:rgba(114,6,6,0.05);padding:44px 40px;border-left:3px solid var(--fire);}
+.d-stat{padding:24px 0;border-bottom:1px solid rgba(114,6,6,0.1);}
+.d-stat:last-child{border-bottom:none;}
+.d-n{font-family:var(--serif);font-size:52px;color:var(--fire);line-height:1;letter-spacing:-.02em;font-weight:400;}
+.d-lbl{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6;}
+
+/* NUM LIST */
+.num-row{display:grid;grid-template-columns:52px 1fr;gap:24px;padding:32px 0;border-bottom:1px solid rgba(114,6,6,0.1);}
+.num-row:first-child{border-top:1px solid rgba(114,6,6,0.1);}
+.num-n{font-family:var(--serif);font-size:42px;color:rgba(114,6,6,0.18);line-height:1;font-weight:400;transition:color .3s;}
+.num-row:hover .num-n{color:var(--fire);}
+.num-c h3{font-family:var(--serif);font-size:17px;font-weight:500;margin-bottom:8px;color:var(--text);}
+.num-c p{font-size:13px;line-height:1.75;color:var(--muted);}
+
+/* PACKAGE */
+.pkg{background:rgba(114,6,6,0.05);padding:60px 52px;margin-top:56px;border:1px solid rgba(114,6,6,0.1);position:relative;overflow:hidden;}
+.pkg-wm{position:absolute;right:-10px;top:-10px;font-family:var(--serif);font-style:italic;font-size:180px;color:rgba(114,6,6,0.06);line-height:1;pointer-events:none;font-weight:500;}
+.pkg-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--fire);margin-bottom:14px;position:relative;}
+.pkg-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,52px);font-weight:500;letter-spacing:-.025em;margin-bottom:20px;position:relative;color:var(--text);}
+.pkg-desc{font-size:14px;line-height:1.8;color:var(--muted);max-width:640px;margin-bottom:36px;position:relative;}
+.pkg-includes-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);margin-bottom:18px;position:relative;}
+.pkg-item{display:flex;gap:14px;font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:11px;position:relative;}
+.pkg-item::before{content:'→';color:var(--fire);flex-shrink:0;}
+
+/* MANIFESTO */
+.manifesto{padding:160px 52px;background:var(--fire);color:var(--depth);position:relative;overflow:hidden;}
+.manifesto::before{content:'NDT';position:absolute;right:-40px;top:50%;transform:translateY(-50%);font-family:var(--serif);font-size:340px;font-style:italic;font-weight:600;color:rgba(235,226,217,0.06);pointer-events:none;line-height:1;white-space:nowrap;}
+.manifesto-q{font-family:var(--serif);font-size:clamp(26px,4.5vw,70px);font-weight:400;line-height:1.1;letter-spacing:-.03em;max-width:1000px;}
+.manifesto-q em{font-style:italic;color:rgba(235,226,217,0.65);}
+.manifesto-attr{margin-top:32px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(235,226,217,0.4);}
+.manifesto-ctas{margin-top:60px;display:flex;gap:24px;flex-wrap:wrap;}
+
+/* BUTTONS */
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--depth);color:var(--fire);padding:14px 32px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s;}
+.btn-p:hover{background:var(--found);color:var(--depth);transform:translateY(-2px);}
+.btn-p-fire{display:inline-flex;align-items:center;gap:10px;background:var(--fire);color:var(--depth);padding:14px 32px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s;}
+.btn-p-fire:hover{background:var(--strategic);transform:translateY(-2px);}
+.btn-o{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(235,226,217,0.3);color:rgba(235,226,217,0.65);padding:14px 32px;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-o:hover{border-color:var(--depth);color:var(--depth);}
+.btn-o-light{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(114,6,6,0.2);color:var(--muted);padding:14px 32px;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-o-light:hover{border-color:var(--fire);color:var(--fire);}
+
+/* CTA STRIP */
+.cta-strip{padding:120px 52px;text-align:center;background:var(--strategic);color:var(--depth);position:relative;overflow:hidden;}
+.cta-strip::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(181,16,10,0.2) 0%,transparent 70%);}
+.cta-h{font-family:var(--serif);font-size:clamp(36px,5vw,78px);font-weight:400;line-height:1.06;letter-spacing:-.03em;max-width:800px;margin:0 auto 16px;position:relative;}
+.cta-h em{font-style:italic;color:rgba(235,226,217,0.55);}
+.cta-sub{font-size:14px;color:rgba(235,226,217,0.5);max-width:460px;margin:0 auto 48px;line-height:1.78;position:relative;}
+.cta-btns{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;position:relative;}
+
+/* SUBPAGE HERO — A16Z style: full-width BG image + glass panel left */
+.sp-hero{
+  min-height:92vh;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:stretch;
+}
+
+/* Background image layer */
+.sp-hero-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  transition:transform 8s ease;
+}
+.sp-hero:hover .sp-hero-bg{ transform:scale(1.03); }
+
+/* Dark overlay — heavier on left where panel sits, lighter on right */
+.sp-hero-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to right,
+      rgba(4,4,6,0.72) 0%,
+      rgba(4,4,6,0.45) 40%,
+      rgba(4,4,6,0.1) 70%,
+      rgba(4,4,6,0) 100%);
+}
+
+/* Glass panel — floats left, vertically centered */
+.sp-glass{
+  position:relative;
+  z-index:2;
+  width:min(540px, 48%);
+  min-height:60vh;
+  margin:auto 0 auto 52px;
+  padding:52px 48px 52px;
+  background:rgba(4,4,6,0.52);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border:1px solid rgba(235,226,217,0.1);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* Category tag inside glass */
+.sp-glass-tag{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:rgba(235,226,217,0.5);
+  margin-bottom:24px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.sp-glass-tag::before{
+  content:'';
+  width:20px;
+  height:1px;
+  background:rgba(235,226,217,0.4);
+  flex-shrink:0;
+}
+
+/* Title in glass */
+.sp-glass-h1{
+  font-family:var(--serif);
+  font-size:clamp(38px,5.5vw,80px);
+  font-weight:400;
+  line-height:1.04;
+  letter-spacing:-.03em;
+  color:var(--depth);
+  margin-bottom:20px;
+}
+.sp-glass-h1 em{
+  font-style:italic;
+  color:var(--energy);
+}
+
+/* Lead text in glass */
+.sp-glass-lead{
+  font-size:15px;
+  line-height:1.75;
+  color:rgba(235,226,217,0.65);
+  margin-bottom:36px;
+  max-width:420px;
+}
+
+/* CTA link in glass */
+.sp-glass-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--depth);
+  cursor:pointer;
+  transition:gap .2s;
+}
+.sp-glass-cta:hover{ gap:18px; }
+.sp-glass-cta .cta-line{
+  width:32px;
+  height:1px;
+  background:var(--depth);
+  transition:width .2s;
+}
+.sp-glass-cta:hover .cta-line{ width:48px; }
+
+/* Back button — top left over image */
+.sp-back{
+  position:absolute;
+  top:32px;
+  left:52px;
+  z-index:10;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:gap .2s;
+  color:rgba(235,226,217,0.5);
+}
+.sp-back:hover{ gap:14px; color:var(--depth); }
+
+/* Slide counter — bottom right */
+.sp-counter{
+  position:absolute;
+  bottom:36px;
+  right:52px;
+  z-index:10;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.12em;
+  color:rgba(235,226,217,0.4);
+}
+
+/* Legacy selectors — kept for compat */
+.sp-vig{ display:none; }
+.sp-wm{ display:none; }
+.sp-eye{ display:none; }
+.sp-h1{ display:none; }
+.sp-lead{ display:none; }
+
+/* Responsive */
+@media(max-width:1024px){
+  .sp-glass{
+    width:100%;
+    margin:auto 0 0;
+    min-height:auto;
+    padding:36px 28px 44px;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .sp-hero{ min-height:80vh; align-items:flex-end; }
+  .sp-back{ left:24px; top:24px; }
+}
+@media(max-width:600px){
+  .sp-glass{ padding:28px 20px 36px; }
+  .sp-glass-h1{ font-size:clamp(32px,9vw,52px); }
+  .sp-glass-lead{ font-size:14px; }
+}
+
+/* PROGRAM */
+.program-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:64px;}
+.phase{background:rgba(114,6,6,0.04);padding:40px 30px;border-top:2px solid rgba(114,6,6,0.1);transition:all .3s;}
+.phase:hover,.phase.on{border-top-color:var(--fire);background:rgba(114,6,6,0.09);}
+.phase-n{font-family:var(--mono);font-size:10px;color:var(--dimmer);letter-spacing:.12em;margin-bottom:18px;}
+.phase-title{font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:12px;color:var(--text);}
+.phase-desc{font-size:12px;line-height:1.75;color:var(--muted);}
+
+/* FIT */
+.fit-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:56px;}
+.fit-box{background:rgba(114,6,6,0.05);padding:44px 40px;}
+.fit-box.b{background:rgba(114,6,6,0.025);}
+.fit-title{font-family:var(--serif);font-size:19px;margin-bottom:22px;font-weight:500;color:var(--text);}
+.fit-item{display:flex;gap:12px;font-size:13px;color:var(--muted);margin-bottom:13px;line-height:1.55;}
+.chk{color:var(--fire);flex-shrink:0;}
+.xchk{color:var(--dimmer);flex-shrink:0;}
+
+/* FOOTER */
+footer{padding:80px 52px 48px;border-top:1px solid rgba(114,6,6,0.1);background:var(--found);color:var(--depth);position:relative;z-index:1;}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;padding-bottom:56px;border-bottom:1px solid rgba(235,226,217,0.07);}
+.ft-brand{font-family:var(--serif);font-size:22px;margin-bottom:14px;color:var(--energy);}
+.ft-brand .lab{color:var(--depth);}
+.ft-tag{font-size:13px;line-height:1.75;color:rgba(235,226,217,0.4);max-width:270px;}
+.ft-col h4{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(235,226,217,0.22);margin-bottom:18px;}
+.ft-col a{display:block;font-size:13px;color:rgba(235,226,217,0.4);margin-bottom:10px;cursor:pointer;transition:color .2s;}
+.ft-col a:hover{color:var(--depth);}
+.ft-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;}
+.ft-copy{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:rgba(235,226,217,0.2);}
+
+/* ANIMATIONS */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s ease;}
+.reveal.visible{opacity:1;transform:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.au{opacity:0;animation:fadeUp .9s ease forwards;}
+.au-1{animation-delay:.08s}.au-2{animation-delay:.22s}.au-3{animation-delay:.38s}.au-4{animation-delay:.52s}.au-5{animation-delay:.68s}
+
+/* SERVICE CARDS GRID — 3 cards equal or 2×2 */
+.svc-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px;}
+.svc-cards-grid.grid-2x2{grid-template-columns:1fr 1fr;}
+.svc-card{background:rgba(114,6,6,0.05);padding:44px 40px;display:flex;flex-direction:column;transition:background .3s,border-top-color .3s;border-top:2px solid rgba(114,6,6,0.1);}
+.svc-card:hover{background:rgba(114,6,6,0.09);border-top-color:var(--fire);}
+.svc-card-num{font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:.14em;margin-bottom:20px;}
+.svc-card-title{font-family:var(--serif);font-size:24px;font-weight:500;letter-spacing:-.02em;color:var(--text);margin-bottom:16px;line-height:1.2;}
+.svc-card-body{font-size:13px;line-height:1.78;color:var(--muted);flex:1;margin-bottom:20px;}
+.svc-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;}
+.svc-card-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fire);background:transparent;border:1px solid rgba(114,6,6,0.3);padding:10px 20px;cursor:pointer;transition:all .2s;align-self:flex-start;}
+.svc-card-btn:hover{background:var(--fire);color:var(--depth);border-color:var(--fire);}
+
+/* SERVICE DETAIL PAGE */
+.svc-detail-hero{min-height:58vh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 52px 64px;position:relative;overflow:hidden;background:var(--found);}
+.svc-detail-tag{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(235,226,217,0.45);margin-bottom:20px;}
+.svc-detail-h1{font-family:var(--serif);font-size:clamp(40px,6vw,96px);font-weight:400;line-height:.97;letter-spacing:-.03em;color:var(--depth);margin-bottom:28px;}
+.svc-detail-h1 em{font-style:italic;color:var(--energy);}
+.svc-detail-lead{font-size:16px;line-height:1.78;color:rgba(235,226,217,0.55);max-width:600px;}
+
+/* WHAT'S INCLUDED LIST */
+.included-list{margin-top:40px;}
+.included-item{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid rgba(114,6,6,0.1);align-items:flex-start;}
+.included-item:first-child{border-top:1px solid rgba(114,6,6,0.1);}
+.included-icon{color:var(--fire);font-size:14px;flex-shrink:0;margin-top:2px;}
+.included-text{font-size:14px;line-height:1.7;color:var(--muted);}
+.included-text strong{color:var(--text);font-weight:500;}
+
+@media(max-width:1024px){
+  .svc-cards-grid{grid-template-columns:1fr;}
+  .svc-detail-hero{padding:100px 28px 52px;}
+
+  /* NAV — mobile hamburger */
+  nav{padding:18px 24px;}
+  .nav-links{display:none;}
+  .nav-cta{display:none;}
+  .nav-hamburger{display:flex;}
+
+  /* Layout */
+  .hero,.manifesto,.section,.cta-strip,footer{padding-left:24px;padding-right:24px;}
+  .hero-h1{font-size:clamp(52px,10vw,108px);}
+  .hero-row{flex-direction:column;gap:28px;align-items:flex-start;}
+  .col2{grid-template-columns:1fr;gap:40px;margin-top:40px;}
+  .col3,.col4{grid-template-columns:1fr;}
+  .program-grid{grid-template-columns:1fr 1fr;}
+  .fit-grid{grid-template-columns:1fr;}
+  .ft-grid{grid-template-columns:1fr;gap:28px;}
+  .sp-hero{padding:100px 24px 52px;}.sp-back{left:24px;top:88px;}
+  .pkg{padding:36px 24px;}
+  .manifesto-ctas{flex-direction:column;align-items:flex-start;}
+  .svc-detail-hero{padding:96px 24px 48px;}
+  .included-list{margin-top:28px;}
+}
+
+@media(max-width:600px){
+  nav{padding:16px 20px;}
+  .hero,.manifesto,.section,.cta-strip,footer{padding-left:20px;padding-right:20px;}
+  .stats-bar{flex-direction:column;}
+  .program-grid{grid-template-columns:1fr;}
+  .hero-h1{font-size:clamp(46px,13vw,68px);}
+  .hero-h1 .l2{font-size:clamp(40px,11vw,60px);}
+  .svc-cards-grid{grid-template-columns:1fr;}
+  .svc-card{padding:32px 24px;}
+  .cta-btns{flex-direction:column;align-items:stretch;}
+  .cta-btns .btn-p,.cta-btns .btn-o{justify-content:center;}
+  .sp-hero{padding:88px 20px 40px;}
+}
+
+/* MOBILE NAV MENU */
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;z-index:210;}
+.nav-hamburger span{display:block;width:22px;height:1.5px;background:currentColor;transition:all .3s;}
+.nav-hamburger.open span:nth-child(1){transform:rotate(45deg) translate(4.5px,4.5px);}
+.nav-hamburger.open span:nth-child(2){opacity:0;}
+.nav-hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(4.5px,-4.5px);}
+
+.nav-mobile{display:none;position:fixed;inset:0;background:var(--depth);z-index:190;padding:90px 24px 40px;flex-direction:column;overflow-y:auto;}
+.nav-mobile.open{display:flex;}
+nav.dark-nav + .nav-mobile,.nav-mobile.dark-mode{background:var(--found);}
+.nav-mobile-item{border-bottom:1px solid rgba(114,6,6,0.1);}
+.nav-mobile-item > a{display:block;font-family:var(--serif);font-size:28px;font-weight:400;color:var(--text);padding:18px 0;letter-spacing:-.01em;cursor:pointer;}
+.nav-mobile.dark-mode .nav-mobile-item > a{color:var(--depth);}
+.nav-mobile-item > a:hover,.nav-mobile-item > a.active-link{color:var(--fire);}
+.nav-mobile-sub{padding:0 0 16px 0;display:none;flex-direction:column;gap:4px;}
+.nav-mobile-sub.open{display:flex;}
+.nav-mobile-sub a{font-size:14px;color:var(--muted);padding:8px 0;cursor:pointer;letter-spacing:.02em;}
+.nav-mobile-sub a:hover{color:var(--fire);}
+.nav-mobile-sub .drop-label{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);padding:8px 0 2px;}
+.nav-mobile-cta{margin-top:32px;}
+.nav-mobile-cta .btn-p-fire{width:100%;justify-content:center;font-size:12px;}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div class="grid-overlay" aria-hidden="true">
+  <span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo" onclick="goNav('home')">Souls Lab</div>
+  <ul class="nav-links">
+    <li class="nav-item">
+      <a id="nav-home" onclick="goNav('home')">Home</a>
+    </li>
+    <li class="nav-item has-drop">
+      <a id="nav-services">Services</a>
+      <div class="nav-drop">
+        <span class="drop-label">Applied NDT</span>
+        <a id="nav-vc" onclick="goNav('vc')">Applied NDT for VCs</a>
+        <a id="nav-web3" onclick="goNav('web3')">Applied NDT for Web3 Protocols</a>
+        <hr>
+        <span class="drop-label">Work</span>
+        <a id="nav-case-studies" onclick="goNav('case-studies')">Case Studies</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a id="nav-ndt-alliance" onclick="goNav('ndt-alliance')">NDT Alliance</a>
+    </li>
+    <li class="nav-item has-drop">
+      <a id="nav-programs">Programs</a>
+      <div class="nav-drop">
+        <span class="drop-label">Learning & Community</span>
+        <a id="nav-soulsu" onclick="goNav('soulsu')">SoulsU</a>
+        <a id="nav-souls-voices" onclick="goNav('souls-voices')">Souls Voices</a>
+        <a id="nav-souls-build" onclick="goNav('souls-build')">Souls Build</a>
+      </div>
+    </li>
+    <li class="nav-item has-drop">
+      <a id="nav-company">Company</a>
+      <div class="nav-drop">
+        <span class="drop-label">Souls Lab</span>
+        <a id="nav-company-team" onclick="goNav('company-team')">Team</a>
+        <a id="nav-company-about" onclick="goNav('company-about')">About</a>
+        <a id="nav-company-jobs" onclick="goNav('company-jobs')">Jobs</a>
+      </div>
+    </li>
+  </ul>
+  <button class="nav-cta" onclick="goNav('ndt-alliance')">Say Hello →</button>
+  <!-- Hamburger for mobile -->
+  <div class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE NAV OVERLAY -->
+<div class="nav-mobile" id="mobileNav">
+  <div class="nav-mobile-item">
+    <a onclick="goNav('home');closeMobileNav()">Home</a>
+  </div>
+  <div class="nav-mobile-item">
+    <a onclick="toggleMobileSub('sub-services')">Services</a>
+    <div class="nav-mobile-sub" id="sub-services">
+      <span class="drop-label">Applied NDT</span>
+      <a onclick="goNav('vc');closeMobileNav()">Applied NDT for VCs</a>
+      <a onclick="goNav('web3');closeMobileNav()">Applied NDT for Web3 Protocols</a>
+    </div>
+  </div>
+  <div class="nav-mobile-item">
+    <a onclick="goNav('ndt-alliance');closeMobileNav()">NDT Alliance</a>
+  </div>
+  <div class="nav-mobile-item">
+    <a onclick="toggleMobileSub('sub-programs')">Programs</a>
+    <div class="nav-mobile-sub" id="sub-programs">
+      <span class="drop-label">Learning & Community</span>
+      <a onclick="goNav('soulsu');closeMobileNav()">SoulsU</a>
+      <a onclick="goNav('souls-voices');closeMobileNav()">Souls Voices</a>
+      <a onclick="goNav('souls-build');closeMobileNav()">Souls Build</a>
+    </div>
+  </div>
+  <div class="nav-mobile-item">
+    <a onclick="toggleMobileSub('sub-company')">Company</a>
+    <div class="nav-mobile-sub" id="sub-company">
+      <span class="drop-label">Souls Lab</span>
+      <a onclick="goNav('company-team');closeMobileNav()">Team</a>
+      <a onclick="goNav('company-about');closeMobileNav()">About</a>
+      <a onclick="goNav('company-jobs');closeMobileNav()">Jobs</a>
+    </div>
+  </div>
+  <div class="nav-mobile-cta">
+    <span class="btn-p-fire" onclick="goNav('ndt-alliance');closeMobileNav()">Say Hello →</span>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="home" class="page active">
+
+  <section class="hero">
+    <div class="hero-vig"></div>
+    <div class="hero-counter">SOULS.LAB — 2025</div>
+    <h1 class="hero-h1">
+      <span class="l1 au au-1">Capital moves fast.</span>
+      <span class="l2 au au-2">Narrative closes the round.</span>
+    </h1>
+    <div class="hero-row">
+      <p class="hero-desc au au-3">We build the narrative infrastructure that turns protocols, models, and portfolios into legible, fundable, lasting futures.</p>
+      <div class="hero-actions au au-4">
+        <span class="btn-arrow" onclick="go('vc')">Explore our method <span class="a">→</span></span>
+        <span class="btn-label" onclick="go('web3')">See our work</span>
+      </div>
+    </div>
+    <div class="stats-bar au au-5">
+      <div class="stat"><div class="stat-n">40+</div><div class="stat-lbl">Web3 protocols served</div></div>
+      <div class="stat"><div class="stat-n">$2B+</div><div class="stat-lbl">Capital influenced</div></div>
+      <div class="stat"><div class="stat-n">6×</div><div class="stat-lbl">Avg. LP inbound lift</div></div>
+      <div class="stat"><div class="stat-n">12</div><div class="stat-lbl">Blockchain foundations</div></div>
+    </div>
+  </section>
+
+  <section id="methodology" class="section bg-cream reveal">
+    <div class="s-eyebrow">The Methodology</div>
+    <div class="col2" style="margin-top:0;gap:80px;align-items:start;">
+      <h2 class="s-h2">Narrative Design<br>Thinking is not<br><em>copywriting.</em></h2>
+      <div class="s-body" style="padding-top:12px;">
+        <p>In Web3 and AI, the technology is table stakes. The round goes to whoever owns the frame — whoever arrives first with the story that makes builders build, LPs re-up, and communities form around shared belief.</p>
+        <p>Souls Lab pioneered Narrative Design Thinking (NDT): a four-phase methodology that treats storytelling as a design discipline — moving from deep context immersion to measurable Conviction Density across your entire ecosystem.</p>
+        <p>NDT is iterative by design. Every cycle refines perception, sharpens tension, and expands narrative arcs until your story achieves Collective Conviction — the point where belief has deeply penetrated the market.</p>
+      </div>
+    </div>
+
+    <!-- NDT FRAMEWORK STEPS -->
+    <div style="margin-top:72px;" class="reveal">
+      <hr class="div" style="margin-bottom:0;">
+      <div class="ndt-step">
+        <div class="step-n">1</div>
+        <div class="step-content">
+          <h3>Immersion</h3>
+          <p>Map the full perception landscape before designing a single word. Understand audience insights, cultural context, and the existing belief system your narrative must enter. You cannot change what you haven't deeply understood.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Perception Landscape</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Audience Insights</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Cultural Context</span>
+          </div>
+        </div>
+      </div>
+      <div class="ndt-step">
+        <div class="step-n">2</div>
+        <div class="step-content">
+          <h3>Narrative Tension</h3>
+          <p>Every compelling story lives inside a conflict. We define the core tension your narrative must resolve — framing the friction between where your audience is and where they need to go. Tension is not a problem to avoid. It is the engine of belief change.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Define Core Conflict</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Frame Friction</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Establish Tension</span>
+          </div>
+        </div>
+      </div>
+      <div class="ndt-step">
+        <div class="step-n">3</div>
+        <div class="step-content">
+          <h3>Narrative Architecture</h3>
+          <p>Design the complete story structure: narrative arcs, character roles (hero, enemy, guide), themes and metaphors. This is the blueprint — every pitch deck, every LP update, every community post flows from this architecture. Built once. Deployed everywhere.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Design Narrative Arcs</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Assign Roles</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Define Themes & Metaphors</span>
+          </div>
+        </div>
+      </div>
+      <div class="ndt-step">
+        <div class="step-n">4</div>
+        <div class="step-content">
+          <h3>Narrative Diffusion</h3>
+          <p>Strategize the spread. Activate the right channels and media to move your story from its origin point into the full ecosystem — investors, builders, community, media. Diffusion is not distribution. It is the designed propagation of belief through every relevant network node.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Strategize Spread</span>
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(114,6,6,0.12);padding:3px 10px;">Activate Channels & Media</span>
+          </div>
+        </div>
+      </div>
+      <!-- Read now button -->
+      <div style="margin-top:40px;padding-top:40px;border-top:1px solid rgba(114,6,6,0.1);">
+        <a href="https://soulslab.co/ndt" target="_blank" style="display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--fire);text-decoration:none;transition:gap .2s;" onmouseover="this.style.gap='18px'" onmouseout="this.style.gap='12px'">
+          <span style="display:inline-block;width:28px;height:1px;background:var(--fire);transition:width .2s;"></span>
+          Read now
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-paper reveal" style="padding-top:80px;">
+    <hr class="div" style="margin-bottom:80px;">
+    <div class="s-eyebrow">Applied NDT</div>
+    <h2 class="s-h2" style="margin-bottom:52px;">Three practices.<br><em>One principle.</em></h2>
+    <div class="svc" onclick="go('vc')">
+      <div class="svc-l"><span class="svc-num">01</span>
+        <div><div class="svc-title">NDT for Web3 VCs</div>
+          <div class="svc-tags"><span class="svc-tag">LP Narratives</span><span class="svc-tag">New Media Package</span><span class="svc-tag">Deal Flow</span><span class="svc-tag">Thesis Crystallization</span></div>
+        </div>
+      </div><span class="svc-arr">→</span>
+    </div>
+    <div class="svc" onclick="go('enterprise')">
+      <div class="svc-l"><span class="svc-num">02</span>
+        <div><div class="svc-title">NDT for AI Enterprise</div>
+          <div class="svc-tags"><span class="svc-tag">NDT Alliance</span><span class="svc-tag">Category Design</span><span class="svc-tag">Transformation Story</span><span class="svc-tag">Embedded Designer</span></div>
+        </div>
+      </div><span class="svc-arr">→</span>
+    </div>
+    <div class="svc" onclick="go('web3')">
+      <div class="svc-l"><span class="svc-num">03</span>
+        <div><div class="svc-title">NDT for Web3 Protocols</div>
+          <div class="svc-tags"><span class="svc-tag">Genesis Narrative</span><span class="svc-tag">GTM Strategy</span><span class="svc-tag">Tokenomics Story</span><span class="svc-tag">Community Activation</span></div>
+        </div>
+      </div><span class="svc-arr">→</span>
+    </div>
+  </section>
+
+  <section id="about" class="section bg-cream reveal">
+    <div class="s-eyebrow">Who We Serve</div>
+    <h2 class="s-h2">Capital allocators<br>and <em>protocol builders</em><br>of Web3.</h2>
+    <div class="col3">
+      <div class="aud" onclick="go('vc')">
+        <div class="aud-tag">VC — 01</div>
+        <div class="aud-title">Web3 / AI<br>Venture Funds</div>
+        <div class="aud-body">Funds deploying into DeFi, L1/L2, AI infrastructure, and RWA. We build the narrative that makes your thesis the one every founder quotes and every LP re-ups into.</div>
+        <div class="aud-link">Explore <span>→</span></div>
+      </div>
+      <div class="aud" onclick="go('web3')">
+        <div class="aud-tag">FOUNDATION — 02</div>
+        <div class="aud-title">Blockchain<br>Foundations</div>
+        <div class="aud-body">Ethereum, Solana, Polkadot, Cosmos, and emerging L1 ecosystems. We design the founding myth and developer activation story that makes your chain the obvious destination.</div>
+        <div class="aud-link">Explore <span>→</span></div>
+      </div>
+      <div class="aud" onclick="go('enterprise')">
+        <div class="aud-tag">ENTERPRISE — 03</div>
+        <div class="aud-title">AI Enterprises<br>& Protocols</div>
+        <div class="aud-body">Companies at the Web3-AI convergence frontier. Verifiable AI, on-chain inference, decentralized data markets. The narrative challenge here is newer than the technology.</div>
+        <div class="aud-link">Explore <span>→</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-ink reveal">
+    <div class="s-eyebrow">In Practice</div>
+    <h2 class="s-h2">How narrative <em>actually</em><br>closes the round.</h2>
+    <div class="col4">
+      <div class="proof-card"><div class="proof-n">MOMENT — 01</div><div class="proof-title">The First Email</div><div class="proof-body">LPs and founders decide in 90 seconds whether your fund has a perspective worth following. NDT designs that moment — the frame that says "this person sees what others don't."</div></div>
+      <div class="proof-card"><div class="proof-n">MOMENT — 02</div><div class="proof-title">The Pitch Room</div><div class="proof-body">A deck is not a pitch. The narrative running through it — the sequence of revelations, the inevitable conclusion — is what puts a term sheet on the table before the hour ends.</div></div>
+      <div class="proof-card"><div class="proof-n">MOMENT — 03</div><div class="proof-title">The Quiet Period</div><div class="proof-body">Between meeting and decision, your narrative runs without you. The essays. The threads. The LP letter that circulated. NDT designs this ambient layer with the same precision as the pitch.</div></div>
+      <div class="proof-card hi"><div class="proof-n">MOMENT — 04</div><div class="proof-title">The Re-Up</div><div class="proof-body">LP re-ups are won in the 12 months before the ask. The updates that built trust. The annual letter that showed pattern recognition. The portfolio story that made them proud to be in.</div></div>
+    </div>
+  </section>
+
+  <section id="thinking" class="manifesto reveal">
+    <div class="s-eyebrow" style="color:rgba(235,226,217,0.4);">The NDT Manifesto</div>
+    <blockquote class="manifesto-q">"Every round has a technical thesis and a human story. The technical thesis gets you the meeting. <em>The human story closes the round.</em>"</blockquote>
+    <div class="manifesto-attr">— Souls Lab, Narrative Design Thinking for Web3 Capital, 2025</div>
+    <div class="manifesto-ctas">
+      <span class="btn-p" onclick="go('vc')">NDT for VCs →</span>
+      <span class="btn-o" onclick="go('web3')">NDT for Protocols</span>
+      <span class="btn-o" onclick="go('enterprise')">NDT for AI</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-grid">
+      <div><div class="ft-brand">Souls<span class="lab"> Lab</span></div><div class="ft-tag">Narrative Design Thinking for the capital allocators and protocol builders of Web3. Capital moves fast. Narrative closes the round.</div></div>
+      <div class="ft-col"><h4>Services</h4><a onclick="go('vc')">NDT for VCs</a><a onclick="go('enterprise')">NDT for AI Enterprise</a><a onclick="go('web3')">NDT for Web3</a><a onclick="go('soulsu')">SoulsU</a></div>
+      <div class="ft-col"><h4>Company</h4><a>About</a><a>Team</a><a>NDT Framework</a><a>Case Studies</a><a>Manifesto</a></div>
+      <div class="ft-col"><h4>Connect</h4><a>Twitter / X</a><a>Mirror</a><a>LinkedIn</a><a>Substack</a><a><span class="__cf_email__" data-cfemail="a4ccc1c8c8cbe4d7cbd1c8d7c8c5c68adcddde">[email&#160;protected]</span></a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
+  </footer>
+</div>
+
+<!-- ══ VC ══ -->
+<div id="vc" class="page">
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('https://www.figma.com/api/mcp/asset/244550da-e8b0-44ca-b770-b72a2ab402a3');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Service 01 — Venture Capital</div>
+      <h1 class="sp-glass-h1">Applied NDT<br><em>for Web3 VCs</em></h1>
+      <p class="sp-glass-lead">Your thesis is sharp. Your portfolio is real. But do LPs feel it? The New Media Package builds the narrative infrastructure that turns your fund into the signal every serious Web3 builder follows.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>Explore the Package</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="col2">
+      <div>
+        <div class="s-eyebrow">The Problem</div>
+        <h2 class="s-h2">VCs talk about deals.<br><em>Great VCs</em><br>shape the<br>conversation.</h2>
+        <div class="s-body" style="margin-top:32px;">
+          <p>In a market where every fund claims to be "thesis-driven" and "founder-friendly," the real differentiator is narrative authority — the ability to define what matters before everyone else does.</p>
+          <p>Most VC communications are reactive. Souls Lab designs the opposite: a living narrative system that makes your fund the one people read first, quote most, and trust longest.</p>
+        </div>
+      </div>
+      <div class="data-box">
+        <div class="s-eyebrow" style="margin-bottom:28px;">What We've Seen</div>
+        <div class="d-stat"><div class="d-n">73%</div><div class="d-lbl">of LPs say a fund's public narrative influences re-up decisions</div></div>
+        <div class="d-stat"><div class="d-n">4×</div><div class="d-lbl">more inbound deal flow for funds with consistent narrative presence</div></div>
+        <div class="d-stat"><div class="d-n">60%</div><div class="d-lbl">of founders research a VC's public narrative before taking a first meeting</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-paper reveal">
+    <div class="s-eyebrow">NDT Services</div>
+    <h2 class="s-h2">One engine.<br><em>Three layers of leverage.</em></h2>
+    <div class="svc-cards-grid">
+
+      <div class="svc-card">
+        <div class="svc-card-num">01</div>
+        <h3 class="svc-card-title">The Full New Media</h3>
+        <p class="svc-card-body">Your fund's permanent media infrastructure — owned, not rented. We build and operate the fund's owned channels, establish a consistent voice and narrative across the fund and portfolio, and create a repeatable creative system that compounds over time.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">Owned Channels</span>
+          <span class="svc-tag">Voice System</span>
+          <span class="svc-tag">Content Engine</span>
+        </div>
+        <button class="svc-card-btn" onclick="goNav('svc-social')">View Detail →</button>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-card-num">02</div>
+        <h3 class="svc-card-title">Go-to-SEA Distribution</h3>
+        <p class="svc-card-body">1,500+ vetted creators and KOLs, ready to activate on launch day. Orchestrated launches across media, creators, and communities — built specifically for product launches, strategic milestones, and announcements that need to move markets.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">1,500+ KOLs</span>
+          <span class="svc-tag">Creator Network</span>
+          <span class="svc-tag">Launch Activation</span>
+        </div>
+        <button class="svc-card-btn" onclick="goNav('svc-vietnam')">View Detail →</button>
+      </div>
+
+      <div class="svc-card">
+        <div class="svc-card-num">03</div>
+        <h3 class="svc-card-title">High-Signal Talents</h3>
+        <p class="svc-card-body">The people who execute when it matters most — embedded, not outsourced. We train media-native operators, deploy them directly into portfolio companies, and run events that both build talent and strengthen the fund's public image.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">Embedded Operators</span>
+          <span class="svc-tag">Portfolio Deployment</span>
+          <span class="svc-tag">IRL Events</span>
+        </div>
+        <button class="svc-card-btn" onclick="goNav('svc-fullstack')">View Detail →</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="pkg">
+      <div class="pkg-wm">New</div>
+      <div class="pkg-lbl">Signature Package</div>
+      <div class="pkg-title">The New Media Package</div>
+      <p class="pkg-desc">We operate as infrastructure, not a vendor. Our role is to sit inside the fund and its portfolio at critical moments — shaping narrative, activating distribution, and executing launches when timing matters most.</p>
+      <div class="pkg-includes-lbl">What's Included</div>
+      <div class="pkg-item"><strong>Your in-house New Media team</strong> — Own and run the fund's media channels: content calendar, voice system, narrative positioning. You focus on deals; we handle the signal</div>
+      <div class="pkg-item"><strong>Portfolio Amplification</strong> — Every portco gets access to Souls Lab's launch infrastructure at exclusive rates</div>
+      <div class="pkg-item"><strong>A Pre-Built Talent & Creator Network</strong> — Training programs, IRL events, creator networks, all co-branded with your fund. Ecosystem presence without event overhead</div>
+      <div class="pkg-item"><strong>NDT Alliance Special Invitation</strong> — An exclusive invitation to the NDT Alliance: the network of narrative-first funds, operators, and AI enterprises shaping the next era of venture storytelling in Asia</div>
+      <div class="pkg-item"><strong>Co-Brand Visibility</strong> — Featured as a Founding Partner across Souls Lab's full ecosystem: media channels, flagship programs, builders network, and public-facing content</div>
+      <div style="margin-top:40px;"><span class="btn-p-fire" onclick="goNav('ndt-alliance')">APPLY FOR NEW MEDIA PACKAGE →</span></div>
+    </div>
+  </section>
+
+  <section class="cta-strip reveal" style="background:var(--found);">
+    <h2 class="cta-h">New Media is<br>the <em>new moat.</em></h2>
+    <p class="cta-sub">The best venture funds in the world are deploying narrative, distribution, and media infrastructure. Souls Lab builds that infrastructure — for funds that want to lead the next cycle.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="goNav('home')">← Back to Souls Lab</span>
+      <span class="btn-o" onclick="goNav('soulsu')">Explore SoulsU →</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-grid">
+      <div><div class="ft-brand">Souls<span class="lab"> Lab</span></div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div>
+      <div class="ft-col"><h4>Services</h4><a onclick="go('vc')">NDT for VCs</a><a onclick="go('enterprise')">NDT for AI Enterprise</a><a onclick="go('web3')">NDT for Web3</a><a onclick="go('soulsu')">SoulsU</a></div>
+      <div class="ft-col"><h4>Home</h4><a onclick="go('home')">← Souls Lab</a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div>
+  </footer>
+</div>
+
+<!-- ══ ENTERPRISE ══ -->
+<div id="enterprise" class="page">
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1800&q=80');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Service 03 — AI Enterprise</div>
+      <h1 class="sp-glass-h1">Applied NDT<br><em>for AI Enterprise</em></h1>
+      <p class="sp-glass-lead">AI transformation is not a technology problem — it is a narrative one. The NDT Alliance embeds forward-deployed narrative designers inside your organization to lead the story from within.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>Explore the Alliance</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="col2">
+      <div>
+        <div class="s-eyebrow">The Challenge</div>
+        <h2 class="s-h2">Your AI is real.<br><em>Does anyone<br>believe it?</em></h2>
+        <div class="s-body" style="margin-top:32px;">
+          <p>Enterprise AI adoption fails most often not because of technical gaps, but narrative gaps. Employees don't trust the change. Customers don't understand the value. Regulators don't feel addressed. The board sees risk, not opportunity.</p>
+          <p>The NDT Alliance treats narrative as infrastructure — designed, tested, iterated, and deployed with the same rigor as the technology itself.</p>
+        </div>
+      </div>
+      <div class="data-box">
+        <div class="s-eyebrow" style="margin-bottom:24px;">The Alliance Model</div>
+        <div class="num-row" style="border-top:none;padding-top:0;"><div class="num-n">1</div><div class="num-c"><h3>Embed, Don't Consult</h3><p>Our designers join your team, attend your meetings, and feel your culture before designing for it.</p></div></div>
+        <div class="num-row"><div class="num-n">2</div><div class="num-c"><h3>Story Before Slide</h3><p>We start with the human experience of AI, build the narrative structure, then the communications.</p></div></div>
+        <div class="num-row"><div class="num-n">3</div><div class="num-c"><h3>Measure Belief</h3><p>Track comprehension, trust scores, adoption sentiment — not reach and impressions.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-paper reveal">
+    <div class="s-eyebrow">Service Areas</div>
+    <h2 class="s-h2">Narrative design<br>for every <em>AI layer.</em></h2>
+    <div class="col3">
+      <div class="fc"><h3>Internal Transformation Narrative</h3><p>Design the internal story arc: what changes, what stays the same, what this means for every role. Employees understand, embrace, and advocate for AI adoption.</p></div>
+      <div class="fc"><h3>Customer-Facing AI Story</h3><p>Translate technical AI capability into human-centered value. Help customers feel the benefit before they can articulate the mechanism.</p></div>
+      <div class="fc"><h3>Regulatory & Board Narrative</h3><p>Design communications that address risk, build trust, and demonstrate responsible AI deployment in the language that matters to each audience.</p></div>
+      <div class="fc"><h3>Category Ownership</h3><p>Define the category before a competitor does. Name, frame, and claim your space in the emerging AI landscape using NDT methodology.</p></div>
+      <div class="fc"><h3>Crisis Narrative Preparation</h3><p>Design the narrative architecture for when things go wrong — AI errors, data controversies, workforce impact. Pre-built stories for hard moments.</p></div>
+      <div class="fc"><h3>Ecosystem Storytelling</h3><p>Help AI platforms tell the story of their ecosystem — partners, developers, and customers as protagonists in a shared mission narrative.</p></div>
+    </div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="pkg">
+      <div class="pkg-wm">NDT</div>
+      <div class="pkg-lbl">Signature Package</div>
+      <div class="pkg-title">The NDT Alliance Package</div>
+      <p class="pkg-desc">A 6-month embedded narrative design partnership for AI enterprises navigating transformation, market positioning, or ecosystem expansion. Minimum: 1 forward-deployed narrative designer, full-time.</p>
+      <div class="pkg-includes-lbl">What's Included</div>
+      <div class="pkg-item">1 Embedded Forward-Deployed Narrative Designer — full-time, 6 months</div>
+      <div class="pkg-item">NDT Immersion Sprint — 2-week discovery: stakeholder interviews, culture mapping, narrative audit</div>
+      <div class="pkg-item">AI Transformation Narrative Blueprint — complete multi-audience story architecture</div>
+      <div class="pkg-item">Internal Communications System — templates, scripts, manager guides for AI change comms</div>
+      <div class="pkg-item">Category Definition Document — the single framing that establishes market ownership</div>
+      <div class="pkg-item">Executive Narrative Coaching — monthly C-suite sessions on storytelling for boards and investors</div>
+      <div class="pkg-item">External Content Program — 24 flagship pieces over 6 months</div>
+      <div class="pkg-item">Knowledge transfer — leave with a methodology, not a dependency on Souls Lab</div>
+      <div style="margin-top:40px;"><span class="btn-p-fire">Apply for NDT Alliance →</span></div>
+    </div>
+  </section>
+
+  <section class="cta-strip reveal">
+    <h2 class="cta-h">The forward-deployed model<br>is the <em>only model that works.</em></h2>
+    <p class="cta-sub">AI transformation narratives designed in isolation fail. Success requires someone inside — who feels the politics, the fear, the hope — and designs from there.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="go('home')">← Back to Souls Lab</span>
+      <span class="btn-o" onclick="go('soulsu')">Train Your Own → SoulsU</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-grid">
+      <div><div class="ft-brand">Souls<span class="lab"> Lab</span></div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div>
+      <div class="ft-col"><h4>Services</h4><a onclick="go('vc')">NDT for VCs</a><a onclick="go('enterprise')">NDT for AI Enterprise</a><a onclick="go('web3')">NDT for Web3</a><a onclick="go('soulsu')">SoulsU</a></div>
+      <div class="ft-col"><h4>Home</h4><a onclick="go('home')">← Souls Lab</a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div>
+  </footer>
+</div>
+
+<!-- ══ WEB3 ══ -->
+<div id="web3" class="page">
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('https://www.figma.com/api/mcp/asset/593b4ca4-a444-42e4-9ab4-e7bdc91eecc7');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Service 02 — Web3 Protocols</div>
+      <h1 class="sp-glass-h1">Applied NDT<br><em>for Web3 Protocols</em></h1>
+      <p class="sp-glass-lead">The whitepaper describes the machine. The narrative builds the cathedral. From genesis story to token launch — we design the complete GTM narrative system that makes your protocol feel inevitable.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>Explore the Package</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="col2">
+      <div>
+        <div class="s-eyebrow">The Reality</div>
+        <h2 class="s-h2">Most protocols<br><em>launch.</em><br>Few protocols<br><em>land.</em></h2>
+        <div class="s-body" style="margin-top:32px;">
+          <p>The graveyard of Web3 is full of technically brilliant protocols that couldn't explain why they mattered. Whitepaper quality is not enough. Token mechanics are not enough. Even a great team is not enough without the narrative infrastructure to convert attention into adoption.</p>
+          <p>We work with protocols at every stage — from pre-launch to post-launch ecosystem storytelling — using NDT to design the story system that makes your protocol inevitable.</p>
+        </div>
+      </div>
+      <div class="data-box">
+        <div class="s-eyebrow" style="margin-bottom:24px;">The GTM Narrative Stack</div>
+        <div class="num-row" style="border-top:none;padding-top:0;"><div class="num-n">1</div><div class="num-c"><h3>Genesis Narrative</h3><p>The founding myth — why this, why now, why you.</p></div></div>
+        <div class="num-row"><div class="num-n">2</div><div class="num-c"><h3>Technical Translation</h3><p>Architecture stories for developers, investors, and community.</p></div></div>
+        <div class="num-row"><div class="num-n">3</div><div class="num-c"><h3>Community Activation</h3><p>The narrative that builds an identity, not just an audience.</p></div></div>
+        <div class="num-row"><div class="num-n">4</div><div class="num-c"><h3>Institutional Pitch</h3><p>Foundation & VC narratives — the story for those who write checks.</p></div></div>
+        <div class="num-row"><div class="num-n">5</div><div class="num-c"><h3>Ecosystem Mythology</h3><p>The long story — how your protocol becomes a movement.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-paper reveal">
+    <div class="s-eyebrow">Our Services</div>
+    <h2 class="s-h2">Four services.<br><em>One growth engine.</em></h2>
+    <div class="svc-cards-grid" style="grid-template-columns:1fr 1fr;">
+
+      <!-- Card 01 -->
+      <div class="svc-card">
+        <div class="svc-card-num">01</div>
+        <h3 class="svc-card-title">Go-to-Vietnam Market</h3>
+        <p class="svc-card-body">Full narrative and market-entry strategy for funds and protocols entering the Vietnamese Web3 ecosystem. We map the landscape, build the local story, and open the right doors.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">Pho Strategy</span>
+          <span class="svc-tag">Banh Mi Strategy</span>
+          <span class="svc-tag">Cafe Strategy</span>
+        </div>
+        <button class="svc-card-btn" onclick="window.open('https://soulslab.co/marketplaces','_blank')">View Detail →</button>
+      </div>
+
+      <!-- Card 02 -->
+      <div class="svc-card">
+        <div class="svc-card-num">02</div>
+        <h3 class="svc-card-title">Full-stack Content for Social Growth</h3>
+        <p class="svc-card-body">The complete content infrastructure: strategy, writing, design, video, distribution, and analytics — all managed by one embedded narrative team operating inside your organization.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">Strategy</span>
+          <span class="svc-tag">Twitter/X</span>
+          <span class="svc-tag">LinkedIn</span>
+          <span class="svc-tag">Substack</span>
+          <span class="svc-tag">Podcast</span>
+        </div>
+        <button class="svc-card-btn" onclick="goNav('svc-social')">View Detail →</button>
+      </div>
+
+      <!-- Card 03 -->
+      <div class="svc-card">
+        <div class="svc-card-num">03</div>
+        <h3 class="svc-card-title">Short-Form Video Services</h3>
+        <p class="svc-card-body">Scripting, production, and distribution of short-form video content for TikTok, YouTube Shorts, and Instagram Reels. Translate complex Web3 and AI ideas into stories that move.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">TikTok</span>
+          <span class="svc-tag">YouTube Shorts</span>
+          <span class="svc-tag">Reels</span>
+        </div>
+        <button class="svc-card-btn" onclick="goNav('svc-video')">View Detail →</button>
+      </div>
+
+      <!-- Card 04 -->
+      <div class="svc-card">
+        <div class="svc-card-num">04</div>
+        <h3 class="svc-card-title">Exclusive Campaigns with 1500+ Souls Creators Network</h3>
+        <p class="svc-card-body">Instant run campaigns with small budget and distribute to our pre-vetted creator and KOL network across SEA and globally.</p>
+        <div class="svc-card-tags">
+          <span class="svc-tag">Strategy</span>
+          <span class="svc-tag">Campaigns</span>
+          <span class="svc-tag">Creators Network</span>
+        </div>
+        <button class="svc-card-btn" onclick="goNav('svc-fullstack')">View Detail →</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TRUSTED BY — logo sliding marquee -->
+  <section style="background:var(--depth);padding:40px 0 44px;border-top:1px solid rgba(26,8,8,0.07);border-bottom:1px solid rgba(26,8,8,0.07);overflow:hidden;">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dimmer);margin-bottom:28px;text-align:center;">Trusted by</div>
+    <div style="position:relative;">
+      <!-- Fade edges -->
+      <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(to right,var(--depth),transparent);z-index:2;pointer-events:none;"></div>
+      <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(to left,var(--depth),transparent);z-index:2;pointer-events:none;"></div>
+      <!-- Marquee track -->
+      <div style="display:flex;animation:logo-slide 18s linear infinite;width:max-content;" onmouseover="this.style.animationPlayState='paused'" onmouseout="this.style.animationPlayState='running'">
+        <!-- SET 1 -->
+        <!-- Newton -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 120 28" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="12" fill="none" stroke="#1a0808" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="6" fill="#1a0808" opacity=".3"/>
+            <circle cx="14" cy="14" r="2" fill="#1a0808"/>
+            <text x="32" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">Newton</text>
+          </svg>
+        </div>
+        <!-- Divider -->
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <!-- Mantle -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 110 28" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="14,4 24,22 4,22" fill="none" stroke="#1a0808" stroke-width="1.5"/>
+            <text x="30" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">Mantle</text>
+          </svg>
+        </div>
+        <!-- Divider -->
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <!-- FlowX Finance -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 14 Q9 4 14 14 Q19 24 24 14" fill="none" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/>
+            <text x="32" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">FlowX Finance</text>
+          </svg>
+        </div>
+        <!-- Divider -->
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <!-- SET 2 (duplicate for seamless loop) -->
+        <!-- Newton -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 120 28" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="12" fill="none" stroke="#1a0808" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="6" fill="#1a0808" opacity=".3"/>
+            <circle cx="14" cy="14" r="2" fill="#1a0808"/>
+            <text x="32" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">Newton</text>
+          </svg>
+        </div>
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <!-- Mantle -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 110 28" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="14,4 24,22 4,22" fill="none" stroke="#1a0808" stroke-width="1.5"/>
+            <text x="30" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">Mantle</text>
+          </svg>
+        </div>
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <!-- FlowX Finance -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 14 Q9 4 14 14 Q19 24 24 14" fill="none" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/>
+            <text x="32" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">FlowX Finance</text>
+          </svg>
+        </div>
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <!-- SET 3 (second duplicate) -->
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 120 28" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="12" fill="none" stroke="#1a0808" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="6" fill="#1a0808" opacity=".3"/>
+            <circle cx="14" cy="14" r="2" fill="#1a0808"/>
+            <text x="32" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">Newton</text>
+          </svg>
+        </div>
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 110 28" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="14,4 24,22 4,22" fill="none" stroke="#1a0808" stroke-width="1.5"/>
+            <text x="30" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">Mantle</text>
+          </svg>
+        </div>
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:0 56px;flex-shrink:0;">
+          <svg height="28" viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 14 Q9 4 14 14 Q19 24 24 14" fill="none" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/>
+            <text x="32" y="20" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#1a0808" letter-spacing="-.2">FlowX Finance</text>
+          </svg>
+        </div>
+        <div style="width:1px;height:24px;background:rgba(26,8,8,0.12);align-self:center;flex-shrink:0;"></div>
+      </div>
+    </div>
+  </section>
+  <style>
+  @keyframes logo-slide { from{transform:translateX(0)} to{transform:translateX(-33.333%)} }
+  </style>
+
+  <section class="section bg-cream reveal">
+    <div class="pkg">
+      <div class="pkg-lbl">Signature Package</div>
+      <div class="pkg-title">The GTVM Package</div>
+      <p class="pkg-desc">Complete go-to-market narrative and growth strategy for Web3 protocols launching or expanding to the SEA market.</p>
+      <div class="pkg-includes-lbl">What's Included</div>
+      <div class="pkg-item"><strong>Genesis Narrative Document</strong> — founding story, why-now analysis, protocol mythology</div>
+      <div class="pkg-item"><strong>Technical Translation Layer</strong> — explanation system for developers, investors, and community</div>
+      <div class="pkg-item"><strong>GTM Story Map</strong> — timeline of narrative beats from launch to ecosystem maturity</div>
+      <div class="pkg-item"><strong>Community Activation Playbook</strong> — narrative-driven Discord, X, Mirror strategy</div>
+      <div class="pkg-item"><strong>Strategic Partnership Enforcement</strong> — structure and narrative for the strategic partnership enforcement</div>
+      <div class="pkg-item"><strong>Content & Campaign Launch</strong> — 30-day launch narrative, 10 flagship pieces, campaign strategy</div>
+      <div class="pkg-item"><strong>Ongoing NDT Advisory</strong> — monthly narrative strategy sessions for 6 months post-delivery</div>
+      <div style="margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;">
+        <span class="btn-p-fire" onclick="goNav('case-studies')">Read Case Studies →</span>
+        <span style="display:inline-flex;align-items:center;gap:10px;border:1px solid var(--fire);color:var(--fire);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:14px 28px;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='var(--fire)';this.style.color='var(--depth)'" onmouseout="this.style.background='transparent';this.style.color='var(--fire)'">Design Your GTVM →</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="manifesto reveal" style="padding:140px 52px;">
+    <div class="s-eyebrow" style="color:rgba(235,226,217,0.4);">Web3 Protocol Storytelling</div>
+    <blockquote class="manifesto-q">"The whitepaper describes the machine.<br><em>The narrative builds the cathedral.</em>"</blockquote>
+    <div class="manifesto-attr">— Souls Lab NDT for Web3 Protocols</div>
+    <div class="manifesto-ctas">
+      <span class="btn-p" onclick="goNav('ndt-alliance')">Start with a Narrative Audit →</span>
+      <span class="btn-o" onclick="goNav('home')">← Back to Souls Lab</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-grid">
+      <div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div>
+      <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">NDT for VCs</a><a onclick="goNav('web3')">NDT for Web3</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a><a onclick="goNav('case-studies')">Case Studies</a></div>
+      <div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div>
+  </footer>
+</div>
+
+<!-- ══ SOULSU ══ -->
+<div id="soulsu" class="page">
+<style>
+/* ── SOULSU PAGE — primary color override: #2F5D50 ─────────────
+   All fire/energy references within #soulsu are overridden.
+   Does NOT affect any other page. */
+#soulsu { --soulsu-primary: #2F5D50; --soulsu-light: #3d7a68; --soulsu-muted: rgba(47,93,80,0.55); }
+
+/* Fire color → SoulsU green */
+#soulsu .s-eyebrow,
+#soulsu .sp-glass-tag,
+#soulsu .sp-glass-cta,
+#soulsu .pkg-lbl,
+#soulsu .btn-p-fire,
+#soulsu .included-icon,
+#soulsu .svc-card-num,
+#soulsu .svc-tag,
+#soulsu .d-n { color: #2F5D50 !important; }
+
+/* Borders and lines using fire */
+#soulsu .data-box { border-left-color: #2F5D50 !important; }
+#soulsu .svc-card { border-top-color: rgba(47,93,80,0.18) !important; }
+#soulsu .svc-card-btn { border-color: rgba(47,93,80,0.25) !important; color: #2F5D50 !important; }
+#soulsu .svc-card-btn:hover { background: #2F5D50 !important; color: var(--depth) !important; }
+
+/* Eyebrow line */
+#soulsu .s-eyebrow::before { background: #2F5D50 !important; }
+
+/* Italic em in headings */
+#soulsu .s-h2 em,
+#soulsu .sp-glass-h1 em,
+#soulsu .cta-h em,
+#soulsu .manifesto-q em { color: #2F5D50 !important; }
+
+/* Buttons */
+#soulsu .btn-p { background: #2F5D50 !important; }
+#soulsu .btn-p:hover { background: #24493f !important; }
+#soulsu .btn-p-fire { background: #2F5D50 !important; }
+#soulsu .btn-p-fire:hover { background: #24493f !important; }
+
+/* SP glass CTA line */
+#soulsu .cta-line { background: var(--depth) !important; }
+
+/* Nav active indicator when on soulsu */
+#nav-programs { color: #2F5D50 !important; }
+
+/* Pkg watermark */
+#soulsu .pkg-wm { color: rgba(47,93,80,0.06) !important; }
+
+/* Included list icon */
+#soulsu .included-item .included-icon { color: #2F5D50 !important; }
+
+/* Stats number color override */
+#soulsu .stat-n { color: #2F5D50 !important; }
+
+/* Hero glassmorphism accent — removed to avoid color bleed */
+
+/* Section dividers */
+#soulsu hr.div { border-color: rgba(47,93,80,0.15) !important; }
+</style>
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1800&q=80');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Program — Training</div>
+      <h1 class="sp-glass-h1">Train to become<br><em>a certified narrative designer.</em></h1>
+      <p class="sp-glass-lead">SoulsU is the world's first certification program for forward-deployed narrative designers — practitioners trained in NDT methodology and placed inside the organizations shaping Web3 and AI.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>Apply for SoulsU</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="col2">
+      <div>
+        <div class="s-eyebrow">A New Role</div>
+        <h2 class="s-h2">The world needs<br>narrative designers<br>on the <em>frontier.</em></h2>
+        <div class="s-body" style="margin-top:32px;">
+          <p>Forward-deployed narrative designers are a new kind of practitioner. Not copywriters. Not strategists. Not brand consultants. People who move between the technical and the human, between the organization and the market, between the present and the possible — and design the story that connects all of it.</p>
+          <p>SoulsU trains these people and places them with the organizations that need them most: Web3 protocols, AI enterprises, and the venture funds that back them both.</p>
+        </div>
+      </div>
+      <div class="data-box" style="border-left-color:var(--gold);">
+        <div class="d-stat"><div class="d-n" style="color:var(--gold);">10,000+</div><div class="d-lbl">Web3 and AI organizations globally with no dedicated narrative design capacity</div></div>
+        <div class="d-stat"><div class="d-n" style="color:var(--gold);">$0</div><div class="d-lbl">formal certification programs for this role — prior to SoulsU</div></div>
+        <div class="d-stat"><div class="d-n">100%</div><div class="d-lbl">placement rate for SoulsU graduates across Cohorts 1 and 2</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-paper reveal">
+    <div class="s-eyebrow">The Program</div>
+    <h2 class="s-h2">12 weeks.<br><em>Three transformations.</em></h2>
+    <div class="program-grid">
+      <div class="phase on" style="border-top-color:var(--gold);background:rgba(197,162,93,0.07);">
+        <div class="phase-n">PHASE 01 · Weeks 1–3</div>
+        <div class="phase-title">NDT Foundations</div>
+        <div class="phase-desc">Master the Narrative Design Thinking methodology — theory, tools, and mindset. Deep dives into narrative theory, cognitive framing, and the specific challenges of Web3 and AI storytelling.</div>
+      </div>
+      <div class="phase">
+        <div class="phase-n">PHASE 02 · Weeks 4–6</div>
+        <div class="phase-title">Applied Practice</div>
+        <div class="phase-desc">Live client work with Souls Lab's portfolio. Students work in pairs on real briefs, presenting weekly to practitioners for feedback that sharpens instinct and craft.</div>
+      </div>
+      <div class="phase">
+        <div class="phase-n">PHASE 03 · Weeks 7–10</div>
+        <div class="phase-title">Specialization Track</div>
+        <div class="phase-desc">Choose your path: Web3 Protocol Narrative, VC & Fund Storytelling, or AI Enterprise Transformation. Deep craft work in your chosen vertical with practitioners as mentors.</div>
+      </div>
+      <div class="phase">
+        <div class="phase-n">PHASE 04 · Weeks 11–12</div>
+        <div class="phase-title">Deployment Ready</div>
+        <div class="phase-desc">Portfolio completion, placement interviews, and a capstone project demonstrating your ability to operate as a forward-deployed narrative designer. Graduation + certification.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream reveal">
+    <div class="s-eyebrow">Specialization Tracks</div>
+    <h2 class="s-h2">Three paths.<br><em>One certification.</em></h2>
+    <div class="col3">
+      <div class="fc" style="border-left-color:var(--fire);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Track A</div>
+        <h3>Web3 Protocol Narrative</h3>
+        <p>Genesis narratives, technical translation, tokenomics stories, governance activation, ecosystem mythology. Built for those heading to blockchain foundations and DeFi protocols.</p>
+      </div>
+      <div class="fc" style="border-left-color:var(--gold);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Track B</div>
+        <h3>VC & Fund Storytelling</h3>
+        <p>Thesis crystallization, LP communications, portfolio story systems, and new media production. Built for those heading to venture firms, family offices, and investment platforms.</p>
+      </div>
+      <div class="fc" style="border-left-color:var(--muted);">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Track C</div>
+        <h3>AI Enterprise Transformation</h3>
+        <p>Internal change communication, external AI narrative, regulatory storytelling, and category design. Built for those heading to AI companies and enterprises deploying AI at scale.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-paper reveal">
+    <div class="s-eyebrow">Who Should Apply</div>
+    <h2 class="s-h2">Built for the <em>right people.</em></h2>
+    <div class="fit-grid">
+      <div class="fit-box">
+        <div class="fit-title">You are a great fit if…</div>
+        <div class="fit-item"><span class="chk">✓</span> You have 2–7 years in writing, strategy, product, marketing, or design</div>
+        <div class="fit-item"><span class="chk">✓</span> You're genuinely curious about Web3, AI, or venture capital</div>
+        <div class="fit-item"><span class="chk">✓</span> You believe story is a design problem, not just a talent problem</div>
+        <div class="fit-item"><span class="chk">✓</span> You want to be embedded, not advisory — you work inside the problem</div>
+        <div class="fit-item"><span class="chk">✓</span> You can thrive in ambiguity and rapid, high-stakes change</div>
+      </div>
+      <div class="fit-box b">
+        <div class="fit-title">You may not be ready if…</div>
+        <div class="fit-item"><span class="xchk">○</span> You're looking for a copywriting or content marketing course</div>
+        <div class="fit-item"><span class="xchk">○</span> You want to remain in an advisory capacity — we train operators</div>
+        <div class="fit-item"><span class="xchk">○</span> You're not willing to commit to the full 12 weeks of the program</div>
+        <div class="fit-item"><span class="xchk">○</span> You expect a passive learning environment — this is practitioner-first</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-strip reveal" style="background:#2F5D50 !important;">
+    <style>#soulsu .cta-strip.reveal::before{background:none!important;}</style>
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:22px;">COHORT 2025 · APPLICATIONS OPEN</div>
+    <h2 class="cta-h" style="color:#ffffff!important;text-shadow:none;">30 seats.<br><em style="color:rgba(255,255,255,0.82)!important;font-style:italic;">Applications close when full.</em></h2>
+    <p class="cta-sub" style="color:rgba(255,255,255,0.68)!important;">We review every application personally. We care about curiosity, craft, and the courage to work in genuinely hard environments.</p>
+    <div class="cta-btns">
+      <span class="btn-p" style="background:#ffffff!important;color:#2F5D50!important;" onmouseover="this.style.background='#ece8e1'" onmouseout="this.style.background='#ffffff'">Apply for SoulsU Cohort 2025 →</span>
+      <span class="btn-o" style="border-color:rgba(255,255,255,0.4)!important;color:rgba(255,255,255,0.82)!important;" onmouseover="this.style.borderColor='rgba(255,255,255,0.9)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.4)';this.style.color='rgba(255,255,255,0.82)'" onclick="go('home')">← Back to Souls Lab</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-grid">
+      <div>
+        <div class="ft-brand" style="color:var(--gold);">Souls<span class="lab" style="color:var(--depth);"> U</span></div>
+        <div class="ft-tag">SoulsU is a program of Souls Lab. Narrative Design Thinking for the decentralized economy.</div>
+        <div style="font-family:var(--mono);font-size:10px;color:rgba(235,226,217,0.2);margin-top:12px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3a525f5656557a49554f5649565b5814424340">[email&#160;protected]</a></div>
+      </div>
+      <div class="ft-col"><h4>Services</h4><a onclick="go('vc')">NDT for VCs</a><a onclick="go('enterprise')">NDT for AI Enterprise</a><a onclick="go('web3')">NDT for Web3</a><a onclick="go('soulsu')">SoulsU</a></div>
+      <div class="ft-col"><h4>Home</h4><a onclick="go('home')">← Souls Lab</a></div>
+    </div>
+    <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab · SoulsU</div></div>
+  </footer>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<!-- ══ SERVICE: VIETNAM MARKET ══ -->
+<div id="svc-vietnam" class="page">
+  <section class="svc-detail-hero">
+    <div class="sp-wm" style="color:rgba(181,16,10,0.07);">VN</div>
+    <button class="sp-back" onclick="goNav('vc')">← For VCs</button>
+    <div class="svc-detail-tag">Service 01 — Market Entry</div>
+    <h1 class="svc-detail-h1">Go to <em>Vietnam Market</em></h1>
+    <p class="svc-detail-lead">Full narrative and market-entry strategy for funds and protocols entering the Vietnamese Web3 ecosystem. We map the landscape, build the local story, and open the right doors.</p>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="col2" style="margin-top:0;gap:80px;">
+      <div>
+        <div class="s-eyebrow">Why Vietnam</div>
+        <h2 class="s-h2">The next frontier<br>is already <em>here.</em></h2>
+        <div class="s-body" style="margin-top:28px;">
+          <p>Vietnam is one of the highest Web3 adoption markets globally — a young, tech-savvy population, a booming developer community, and a regulatory environment actively courting blockchain innovation.</p>
+          <p>But the window is narrow. The funds and protocols that establish narrative authority now will own the ecosystem for the next decade. We help you move first — and move right.</p>
+        </div>
+      </div>
+      <div>
+        <div class="s-eyebrow" style="margin-bottom:24px;">What's Included</div>
+        <div class="included-list">
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Vietnam Market Narrative</strong> — localized story for Vietnamese founders, communities, and media</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Ecosystem Map</strong> — key players, KOLs, communities, and media contacts</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Local Partnership Strategy</strong> — introductions and relationship playbook</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Community Activation Plan</strong> — Discord, Telegram, local events, and KOL seeding</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Vietnamese Content Package</strong> — translated and culturally adapted flagship content</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>3-Month Advisory Retainer</strong> — embedded support through your Vietnam launch</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-strip reveal">
+    <h2 class="cta-h">Ready to enter<br>the <em>Vietnam market?</em></h2>
+    <p class="cta-sub">Limited engagements per quarter. Applications reviewed personally.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="goNav('vc')">← Back to For VCs</span>
+      <span class="btn-o" onclick="goNav('vc')">See All Services</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Services</h4><a onclick="goNav('svc-vietnam')">Go to Vietnam Market</a><a onclick="goNav('svc-social')">Social Growth</a><a onclick="goNav('svc-video')">Short-Form Video</a><a onclick="goNav('svc-fullstack')">Full-stack Content</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('vc')">← For VCs</a><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ SERVICE: SOCIAL GROWTH ══ -->
+<div id="svc-social" class="page">
+  <section class="svc-detail-hero">
+    <div class="sp-wm" style="color:rgba(181,16,10,0.07);">SG</div>
+    <button class="sp-back" onclick="goNav('vc')">← For VCs</button>
+    <div class="svc-detail-tag">Service 02 — Content Strategy</div>
+    <h1 class="svc-detail-h1">Full-stack Content<br>for <em>Social Growth</em></h1>
+    <p class="svc-detail-lead">End-to-end content strategy and production across Twitter/X, LinkedIn, Mirror, and Farcaster. From editorial calendar to published posts — designed to compound your narrative authority week over week.</p>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="col2" style="margin-top:0;gap:80px;">
+      <div>
+        <div class="s-eyebrow">The Approach</div>
+        <h2 class="s-h2">Content that<br><em>compounds.</em></h2>
+        <div class="s-body" style="margin-top:28px;">
+          <p>Most Web3 social content is reactive — market commentary, announcement reposts, generic threads. It doesn't build a point of view. It doesn't attract the right audience. It doesn't close rounds.</p>
+          <p>We design content systems that compound: each piece reinforces your thesis, expands your reach, and moves the right people closer to conviction. Narrative authority is built over months, not moments.</p>
+        </div>
+      </div>
+      <div>
+        <div class="s-eyebrow" style="margin-bottom:24px;">What's Included</div>
+        <div class="included-list">
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>12-Month Editorial Calendar</strong> — topic clusters, content mix, platform strategy</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Weekly Content Production</strong> — threads, essays, LinkedIn posts, Mirror articles</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Ghostwriting for Partners</strong> — named bylines, authentic voice, zero compromise</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Farcaster & Warpcast Strategy</strong> — native Web3 social presence built for crypto-native audiences</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Analytics & Belief Metrics</strong> — track narrative penetration, not just impressions</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Monthly Strategy Sessions</strong> — narrative refinement based on market feedback</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-strip reveal">
+    <h2 class="cta-h">Ready to build<br><em>narrative authority?</em></h2>
+    <p class="cta-sub">Limited engagements per quarter. Applications reviewed personally.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="goNav('vc')">← Back to For VCs</span>
+      <span class="btn-o" onclick="goNav('vc')">See All Services</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Services</h4><a onclick="goNav('svc-vietnam')">Go to Vietnam Market</a><a onclick="goNav('svc-social')">Social Growth</a><a onclick="goNav('svc-video')">Short-Form Video</a><a onclick="goNav('svc-fullstack')">Full-stack Content</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('vc')">← For VCs</a><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ SERVICE: SHORT-FORM VIDEO ══ -->
+<div id="svc-video" class="page">
+  <section class="svc-detail-hero">
+    <div class="sp-wm" style="color:rgba(181,16,10,0.07);">VD</div>
+    <button class="sp-back" onclick="goNav('vc')">← For VCs</button>
+    <div class="svc-detail-tag">Service 03 — Video Production</div>
+    <h1 class="svc-detail-h1">Short-Form<br><em>Video Services</em></h1>
+    <p class="svc-detail-lead">Scripting, production, and distribution of short-form video content for TikTok, YouTube Shorts, and Instagram Reels. Translate complex Web3 and AI ideas into stories that move — literally.</p>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="col2" style="margin-top:0;gap:80px;">
+      <div>
+        <div class="s-eyebrow">Why Short-Form</div>
+        <h2 class="s-h2">The attention<br>is already <em>there.</em></h2>
+        <div class="s-body" style="margin-top:28px;">
+          <p>TikTok has more Web3-curious users than any blockchain forum. YouTube Shorts drives more developer discovery than any whitepaper. The audiences you need are already watching — they just haven't found you yet.</p>
+          <p>We script, produce, and distribute short-form video that makes complex ideas feel inevitable. No jargon. No dry explainers. Narrative-driven content that earns attention and builds conviction.</p>
+        </div>
+      </div>
+      <div>
+        <div class="s-eyebrow" style="margin-bottom:24px;">What's Included</div>
+        <div class="included-list">
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Monthly Video Calendar</strong> — 12–20 short-form videos per month across platforms</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Script & Narrative Design</strong> — every script engineered for retention and conviction</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Full Production</strong> — filming direction, editing, captions, and platform optimization</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Multi-Platform Distribution</strong> — TikTok, YouTube Shorts, Instagram Reels, X Video</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Trend Integration</strong> — real-time adaptation to trending formats and audio</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Performance Analytics</strong> — weekly reporting on reach, engagement, and audience growth</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-strip reveal">
+    <h2 class="cta-h">Ready to own<br><em>the feed?</em></h2>
+    <p class="cta-sub">Limited engagements per quarter. Applications reviewed personally.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="goNav('vc')">← Back to For VCs</span>
+      <span class="btn-o" onclick="goNav('vc')">See All Services</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Services</h4><a onclick="goNav('svc-vietnam')">Go to Vietnam Market</a><a onclick="goNav('svc-social')">Social Growth</a><a onclick="goNav('svc-video')">Short-Form Video</a><a onclick="goNav('svc-fullstack')">Full-stack Content</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('vc')">← For VCs</a><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ SERVICE: FULL-STACK CONTENT ══ -->
+<div id="svc-fullstack" class="page">
+  <section class="svc-detail-hero">
+    <div class="sp-wm" style="color:rgba(181,16,10,0.07);">FS</div>
+    <button class="sp-back" onclick="goNav('vc')">← For VCs</button>
+    <div class="svc-detail-tag">Service 04 — Complete Package</div>
+    <h1 class="svc-detail-h1">Full-stack Content<br><em>Creation Package</em></h1>
+    <p class="svc-detail-lead">The complete content infrastructure: strategy, writing, design, video, distribution, and analytics — all managed by one embedded narrative team operating inside your organization.</p>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="col2" style="margin-top:0;gap:80px;">
+      <div>
+        <div class="s-eyebrow">The Full Stack</div>
+        <h2 class="s-h2">One team.<br><em>Everything covered.</em></h2>
+        <div class="s-body" style="margin-top:28px;">
+          <p>Most organizations hire separately for strategy, writing, design, video, and distribution. The result is fragmented content with no coherent narrative thread. Each piece is technically fine; together they say nothing.</p>
+          <p>The Full-stack Content Creation Package puts one embedded narrative team across all of it — one strategic thread, consistent voice, and compounding content output that builds real narrative authority over time.</p>
+        </div>
+      </div>
+      <div>
+        <div class="s-eyebrow" style="margin-bottom:24px;">What's Included</div>
+        <div class="included-list">
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Narrative Strategy</strong> — master brand narrative, audience architecture, editorial direction</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Written Content</strong> — essays, threads, newsletters, whitepapers, LP updates</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Visual & Design Content</strong> — infographics, carousels, brand-consistent visual assets</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Short-Form Video</strong> — TikTok, YouTube Shorts, Reels — scripted and produced</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Multi-Platform Distribution</strong> — scheduled, optimized, and managed across all channels</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Analytics & Optimization</strong> — monthly reporting with narrative penetration metrics</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Embedded Team Access</strong> — direct Slack access to your narrative team, daily</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-strip reveal">
+    <h2 class="cta-h">Ready for the<br><em>full stack?</em></h2>
+    <p class="cta-sub">Limited engagements per quarter. Applications reviewed personally.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="goNav('vc')">← Back to For VCs</span>
+      <span class="btn-o" onclick="goNav('vc')">See All Services</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Services</h4><a onclick="goNav('svc-vietnam')">Go to Vietnam Market</a><a onclick="goNav('svc-social')">Social Growth</a><a onclick="goNav('svc-video')">Short-Form Video</a><a onclick="goNav('svc-fullstack')">Full-stack Content</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('vc')">← For VCs</a><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+
+<!-- ══ NDT ALLIANCE ══ -->
+<div id="ndt-alliance" class="page">
+  <!-- HERO -->
+  <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('https://www.figma.com/api/mcp/asset/2e49e8e0-ae0d-4985-88df-6a3d13709528');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Flagship Program</div>
+      <h1 class="sp-glass-h1">The<br><em>NDT Alliance</em></h1>
+      <p class="sp-glass-lead">NDT Alliance brings together AI companies, Web3 protocols, foundations, and media communities — united around one belief: the next wave of technology adoption will be won through narrative, not just product.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>Apply to Join</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+
+  <!-- THE MODEL -->
+  <section class="section bg-cream reveal">
+    <div class="s-eyebrow">The Model</div>
+    <div class="col2" style="margin-top:52px;gap:80px;align-items:start;">
+
+      <!-- LEFT: WHAT'S INCLUDED -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--fire);margin-bottom:28px;">What's Included</div>
+        <div class="included-list">
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text">Access the <strong>Souls Narrative Designers Network</strong> — a curated pool of NDT-certified designers ready to deploy</div>
+          </div>
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text">Run <strong>campaigns with the Souls Narrative Designers Network</strong> — activate designers to build conviction for your products through their voices</div>
+          </div>
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text"><strong>Bring your AI tools to mass adoption</strong> — get your product into the hands of the next generation of narrative professionals</div>
+          </div>
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text">Become a <strong>sponsor of the Web3 Marketing x AI Summit</strong> — the flagship event shaping conviction-driven marketing</div>
+          </div>
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text"><strong>Monthly webinars & X Spaces</strong> — share your product story with the Alliance community</div>
+          </div>
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text"><strong>Quarterly Alliance convening events</strong> — connect with members across AI, Web3, and media</div>
+          </div>
+          <div class="included-item">
+            <span class="included-icon">→</span>
+            <div class="included-text"><strong>24 Flagship Content Pieces</strong> — over 6 months, distributed across the Souls ecosystem</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: MEMBERSHIP TITLE + DESCRIPTION + CTA -->
+      <div style="background:var(--found);padding:52px 44px;color:var(--depth);position:relative;overflow:hidden;">
+        <!-- watermark -->
+        <div style="position:absolute;right:-20px;bottom:-20px;font-family:var(--serif);font-style:italic;font-size:140px;color:rgba(235,226,217,0.04);line-height:1;pointer-events:none;font-weight:400;">NDT</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(235,226,217,0.35);margin-bottom:20px;">Membership, not a vendor.</div>
+        <h2 style="font-family:var(--serif);font-size:clamp(32px,3.5vw,52px);font-weight:400;letter-spacing:-.025em;color:var(--depth);line-height:1.08;margin-bottom:24px;position:relative;">Membership,<br>not a vendor.</h2>
+        <p style="font-size:15px;line-height:1.78;color:rgba(235,226,217,0.55);margin-bottom:20px;position:relative;">NDT Alliance brings together AI companies, Web3 protocols, foundations, and media communities — united around one belief: the next wave of technology adoption will be won through narrative, not just product.</p>
+        <p style="font-size:15px;line-height:1.78;color:rgba(235,226,217,0.55);margin-bottom:36px;position:relative;">At the center is a new kind of professional: the <strong style="color:var(--depth);font-weight:500;">Narrative Designer</strong> — trained in the NDT framework, equipped with AI tools, and deployed to build conviction for the organizations they work with.</p>
+        <span style="background:var(--fire);color:var(--depth);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 28px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .2s;position:relative;" onmouseover="this.style.background='#5a0505'" onmouseout="this.style.background='var(--fire)'">APPLY TO JOIN NDT ALLIANCE →</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section bg-paper reveal">
+    <div class="s-eyebrow">Who It's For</div>
+    <h2 class="s-h2">Three types of<br><em>organizations.</em></h2>
+    <div class="col3" style="margin-top:52px;">
+
+      <div class="fc" style="padding:44px 36px;border-left:2px solid var(--fire);">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--fire);margin-bottom:16px;">01</div>
+        <h3 style="font-family:var(--serif);font-size:24px;font-weight:500;margin-bottom:16px;letter-spacing:-.01em;color:var(--text);">AI Companies</h3>
+        <p style="font-size:13px;line-height:1.78;color:var(--muted);">From early-stage startups to scaling enterprises — AI companies building products that need a market to believe in them before it can fully understand them.</p>
+      </div>
+
+      <div class="fc" style="padding:44px 36px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--fire);margin-bottom:16px;">02</div>
+        <h3 style="font-family:var(--serif);font-size:24px;font-weight:500;margin-bottom:16px;letter-spacing:-.01em;color:var(--text);">Web3 Companies & Foundations</h3>
+        <p style="font-size:13px;line-height:1.78;color:var(--muted);">Protocols, foundations, and on-chain projects that know conviction is the foundation of community — and that narrative is the infrastructure underneath it.</p>
+      </div>
+
+      <div class="fc" style="padding:44px 36px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--fire);margin-bottom:16px;">03</div>
+        <h3 style="font-family:var(--serif);font-size:24px;font-weight:500;margin-bottom:16px;letter-spacing:-.01em;color:var(--text);">Venture Capital</h3>
+        <p style="font-size:13px;line-height:1.78;color:var(--muted);">VC firms that know the narratives of their portfolio companies determine valuation, deal flow, and ecosystem positioning — and want to build that capability systematically.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MANIFESTO CTA -->
+  <section class="cta-strip reveal" style="background:var(--found);">
+    <h2 class="cta-h" style="max-width:860px;">Whoever designs the narrative<br><em>designs the outcome.</em></h2>
+    <p class="cta-sub">Limited to one cohort per quarter. Applications reviewed by founders personally.</p>
+    <div class="cta-btns">
+      <span class="btn-p">APPLY TO JOIN NDT ALLIANCE →</span>
+      <span class="btn-o" onclick="goNav('home')">← Back to Home</span>
+    </div>
+  </section>
+
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">NDT for VCs</a><a onclick="goNav('web3')">NDT for Web3</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div><div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Voices</a><a onclick="goNav('souls-build')">Souls Build</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ SOULS VOICES ══ -->
+<div id="souls-voices" class="page">
+<style>
+/* ── SOULS VOICES SCOPED STYLES ─────────────────── */
+#souls-voices { background:var(--found); color:var(--depth); }
+
+/* Marquee */
+@keyframes sv-scroll { to { transform:translateX(-50%); } }
+.sv-marquee-wrap { overflow:hidden; }
+.sv-marquee-track {
+  display:flex; gap:12px;
+  width:max-content;
+  animation:sv-scroll 32s linear infinite;
+}
+.sv-marquee-track:hover { animation-play-state:paused; }
+.sv-av {
+  width:76px; height:76px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--serif); font-size:22px; font-weight:400;
+  color:rgba(235,226,217,0.35);
+}
+
+/* Path cards — innercircle style */
+.sv-path {
+  display:grid; grid-template-columns:1fr auto;
+  gap:32px; align-items:start;
+  padding:48px 52px;
+  border-top:1px solid rgba(235,226,217,0.07);
+  transition:background .2s;
+  cursor:default;
+}
+.sv-path:hover { background:rgba(235,226,217,0.02); }
+.sv-path-label {
+  font-family:var(--mono); font-size:10px;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:rgba(235,226,217,0.28); margin-bottom:12px;
+}
+.sv-path-title {
+  font-family:var(--serif);
+  font-size:clamp(28px,3.2vw,48px);
+  font-weight:400; letter-spacing:-.03em;
+  color:var(--depth); line-height:1.04; margin-bottom:14px;
+}
+.sv-path-desc {
+  font-size:14px; line-height:1.8;
+  color:rgba(235,226,217,0.46); max-width:560px; margin-bottom:22px;
+}
+.sv-path-link {
+  font-family:var(--mono); font-size:10px;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--energy); cursor:pointer;
+  display:inline-flex; align-items:center; gap:10px; transition:gap .2s;
+}
+.sv-path-link:hover { gap:16px; }
+.sv-path-link span { display:inline-block; width:22px; height:1px; background:var(--energy); }
+.sv-path-badge {
+  font-family:var(--serif);
+  font-size:clamp(16px,1.8vw,26px);
+  font-style:italic;
+  color:rgba(235,226,217,0.12);
+  text-align:right; line-height:1.2; white-space:nowrap;
+}
+.sv-path-badge em {
+  display:block; font-style:normal;
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(235,226,217,0.14); margin-top:6px;
+}
+
+/* X tweet cards */
+.sv-tweets { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.sv-tweet {
+  display:block; text-decoration:none;
+  background:rgba(235,226,217,0.04);
+  border:1px solid rgba(235,226,217,0.08);
+  padding:22px 22px 18px;
+  cursor:pointer;
+  transition:background .18s, border-color .18s, transform .18s;
+  position:relative;
+}
+.sv-tweet:hover {
+  background:rgba(235,226,217,0.075);
+  border-color:rgba(235,226,217,0.18);
+  transform:translateY(-2px);
+}
+.sv-tweet-head { display:flex; align-items:center; gap:11px; margin-bottom:14px; }
+.sv-tweet-av {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  background:rgba(114,6,6,0.45);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--serif); font-size:15px; color:rgba(235,226,217,0.55);
+}
+.sv-tweet-info { flex:1; min-width:0; }
+.sv-tweet-name {
+  font-size:13px; font-weight:500; color:var(--depth);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sv-tweet-handle {
+  font-family:var(--mono); font-size:10px; letter-spacing:.04em;
+  color:rgba(235,226,217,0.32);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sv-tweet-xicon { color:rgba(235,226,217,0.25); flex-shrink:0; transition:color .18s; }
+.sv-tweet:hover .sv-tweet-xicon { color:rgba(235,226,217,0.55); }
+.sv-tweet-body {
+  font-size:14px; line-height:1.7;
+  color:rgba(235,226,217,0.62);
+  margin-bottom:16px;
+  display:-webkit-box; -webkit-line-clamp:6; -webkit-box-orient:vertical; overflow:hidden;
+}
+.sv-tweet-body a { color:var(--energy); }
+.sv-tweet-foot {
+  font-family:var(--mono); font-size:10px; letter-spacing:.06em;
+  color:rgba(235,226,217,0.22);
+  border-top:1px solid rgba(235,226,217,0.07);
+  padding-top:12px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.sv-tweet-foot .open-x { color:rgba(235,226,217,0.35); font-size:11px; }
+.sv-tweet:hover .sv-tweet-foot .open-x { color:var(--energy); }
+
+/* Responsive */
+@media(max-width:1024px){
+  .sv-tweets { grid-template-columns:1fr 1fr; }
+  .sv-path { grid-template-columns:1fr; padding:40px 28px; }
+  .sv-path-badge { display:none; }
+}
+@media(max-width:600px){
+  .sv-tweets { grid-template-columns:1fr; }
+  .sv-path { padding:32px 20px; }
+}
+</style>
+
+<!-- ─── 1. HERO ─────────────────────────────────────────── -->
+<section style="min-height:100vh;background:var(--found);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 40px 64px;position:relative;overflow:hidden;">
+  <!-- grid texture -->
+  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;opacity:.035;background-image:repeating-linear-gradient(0deg,var(--depth) 0,var(--depth) 1px,transparent 1px,transparent 72px),repeating-linear-gradient(90deg,var(--depth) 0,var(--depth) 1px,transparent 1px,transparent 72px);"></div>
+  <!-- glow -->
+  <div aria-hidden="true" style="position:absolute;width:700px;height:500px;top:50%;left:50%;transform:translate(-50%,-58%);background:radial-gradient(ellipse,rgba(114,6,6,0.16) 0%,transparent 68%);pointer-events:none;"></div>
+
+  <button class="sp-back" onclick="goNav('home')">← Home</button>
+
+  <div style="position:relative;max-width:980px;">
+    <p style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(235,226,217,0.28);margin-bottom:28px;">Program — Community</p>
+    <h1 style="font-family:var(--serif);font-size:clamp(54px,9vw,124px);font-weight:400;line-height:.94;letter-spacing:-.04em;color:var(--depth);margin-bottom:22px;">Narrative designers<br>need a <em style="color:var(--energy);">cracked home.</em></h1>
+    <p style="font-size:17px;line-height:1.74;color:rgba(235,226,217,0.48);max-width:460px;margin:0 auto 38px;">Your circle is your edge to build conviction, find collaborators, and raise your narrative game.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <span style="background:var(--fire);color:var(--depth);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:13px 30px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:background .2s;" onmouseover="this.style.background='#5a0505'" onmouseout="this.style.background='var(--fire)'">Join Souls Voices →</span>
+      <a href="https://luma.com" target="_blank" rel="noopener" style="border:1px solid rgba(235,226,217,0.13);color:rgba(235,226,217,0.52);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:13px 30px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(235,226,217,0.32)'" onmouseout="this.style.borderColor='rgba(235,226,217,0.13)'">Events →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 2. PARTNER LOGOS — auto-sliding marquee ─────────────── -->
+<section style="background:var(--found);padding:28px 0;border-top:1px solid rgba(235,226,217,0.06);border-bottom:1px solid rgba(235,226,217,0.06);overflow:hidden;">
+<style>
+@keyframes sv-logo-scroll { to { transform:translateX(-50%); } }
+.sv-logo-track {
+  display:flex;
+  align-items:center;
+  gap:64px;
+  width:max-content;
+  animation:sv-logo-scroll 22s linear infinite;
+}
+.sv-logo-track:hover { animation-play-state:paused; }
+.sv-logo-item {
+  opacity:.38;
+  transition:opacity .2s;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+}
+.sv-logo-item:hover { opacity:.85; }
+</style>
+
+  <div class="sv-logo-track">
+    <!-- SET 1 -->
+    <!-- Coinbase -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 90 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Coinbase</text>
+      </svg>
+    </div>
+    <!-- Solana -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 66 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Solana</text>
+      </svg>
+    </div>
+    <!-- Polkadot -->
+    <div class="sv-logo-item">
+      <svg height="24" viewBox="0 0 26 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="13" cy="5" rx="5" ry="5" fill="white"/>
+        <ellipse cx="13" cy="19" rx="5" ry="5" fill="white"/>
+        <ellipse cx="2.5" cy="9" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="23.5" cy="9" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="2.5" cy="15" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="23.5" cy="15" rx="2.5" ry="2.5" fill="white"/>
+      </svg>
+    </div>
+    <!-- Cosmos -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 66 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Cosmos</text>
+      </svg>
+    </div>
+    <!-- Near -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 44 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Near</text>
+      </svg>
+    </div>
+    <!-- Arbitrum — wordmark with A icon -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 88 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Arbitrum</text>
+      </svg>
+    </div>
+    <!-- Ethereum -->
+    <div class="sv-logo-item">
+      <svg height="24" viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="8,0 0,12 8,16 16,12" fill="white" opacity=".9"/>
+        <polygon points="8,18 0,13.5 8,24 16,13.5" fill="white" opacity=".6"/>
+      </svg>
+    </div>
+    <!-- Avalanche -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 88 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Avalanche</text>
+      </svg>
+    </div>
+
+    <!-- SET 2 — duplicate for seamless loop -->
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 90 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Coinbase</text>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 66 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Solana</text>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="24" viewBox="0 0 26 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="13" cy="5" rx="5" ry="5" fill="white"/>
+        <ellipse cx="13" cy="19" rx="5" ry="5" fill="white"/>
+        <ellipse cx="2.5" cy="9" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="23.5" cy="9" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="2.5" cy="15" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="23.5" cy="15" rx="2.5" ry="2.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 66 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Cosmos</text>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 44 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Near</text>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 88 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Arbitrum</text>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="24" viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="8,0 0,12 8,16 16,12" fill="white" opacity=".9"/>
+        <polygon points="8,18 0,13.5 8,24 16,13.5" fill="white" opacity=".6"/>
+      </svg>
+    </div>
+    <div class="sv-logo-item">
+      <svg height="22" viewBox="0 0 88 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text y="18" font-family="Georgia,serif" font-size="18" font-weight="400" fill="white" letter-spacing="-.3">Avalanche</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─── 3. WHAT'S SOULS VOICES ─────────────────────────────── -->
+<section style="background:var(--found);padding:90px 52px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
+    <div>
+      <h2 style="font-family:var(--serif);font-size:clamp(32px,4vw,56px);font-weight:400;letter-spacing:-.03em;color:var(--depth);line-height:1.05;">What's<br>Souls Creator Network?</h2>
+    </div>
+    <div>
+      <p style="font-size:16px;line-height:1.8;color:rgba(235,226,217,0.52);margin-bottom:16px;">We're a community of 500+ narrative designers, Web3 builders, AI practitioners, and storytellers who have each other's backs.</p>
+      <p style="font-size:16px;line-height:1.8;color:rgba(235,226,217,0.52);margin-bottom:32px;">Private, invite-only. For people who believe storytelling is a design discipline — and want to practice it alongside others who feel the same.</p>
+      <div style="display:flex;gap:44px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--serif);font-size:44px;color:var(--energy);letter-spacing:-.025em;line-height:1;">500+</div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(235,226,217,0.26);margin-top:7px;">Members</div>
+        </div>
+        <div>
+          <div style="font-family:var(--serif);font-size:44px;color:var(--energy);letter-spacing:-.025em;line-height:1;">40+</div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(235,226,217,0.26);margin-top:7px;">Countries</div>
+        </div>
+        <div>
+          <div style="font-family:var(--serif);font-size:44px;color:var(--energy);letter-spacing:-.025em;line-height:1;">12</div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(235,226,217,0.26);margin-top:7px;">Sessions / mo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 4. BE PART OF THE CIRCLE — bento cards ─────────────── -->
+<section style="background:#0a0a0a;padding:80px 52px 100px;">
+  <div style="text-align:center;margin-bottom:56px;">
+    <h2 style="font-family:var(--serif);font-size:clamp(36px,5vw,72px);font-weight:400;letter-spacing:-.03em;color:#ffffff;line-height:1.04;">Be Part Of The Circle</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+
+    <!-- LEARN — #720606 -->
+    <div onclick="goNav('soulsu')" style="position:relative;overflow:hidden;background:#720606;aspect-ratio:.72;padding:28px 26px;cursor:pointer;transition:filter .2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.filter='brightness(1.12)'" onmouseout="this.style.filter='brightness(1)'">
+      <svg style="position:absolute;bottom:0;left:0;width:100%;height:55%;opacity:.18;" viewBox="0 0 300 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><circle cx="80" cy="160" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="80" cy="160" r="58" fill="none" stroke="#fff" stroke-width="12"/><circle cx="80" cy="160" r="86" fill="none" stroke="#fff" stroke-width="8"/><circle cx="80" cy="160" r="114" fill="none" stroke="#fff" stroke-width="6"/><circle cx="220" cy="180" r="24" fill="none" stroke="#fff" stroke-width="12"/><circle cx="220" cy="180" r="50" fill="none" stroke="#fff" stroke-width="8"/></svg>
+      <div style="position:relative;">
+        <div style="font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:10px;">Learn</div>
+        <h3 style="font-family:var(--serif);font-size:clamp(28px,2.8vw,42px);font-weight:400;letter-spacing:-.025em;color:#ffffff;line-height:1.06;margin:0;">Through<br>NDT</h3>
+      </div>
+      <div style="position:relative;">
+        <p style="font-size:13px;line-height:1.72;color:rgba(255,255,255,0.72);margin-bottom:20px;">Master the framework that the next generation of marketers will run on. Access NDT certification courses, workshops, and playbooks — built for those who want to design conviction, not just create content.</p>
+        <span style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.6);display:inline-flex;align-items:center;gap:8px;">Know More <span style="display:inline-block;width:18px;height:1px;background:rgba(255,255,255,0.6);"></span></span>
+      </div>
+    </div>
+
+    <!-- BUILD — #2F5D50 -->
+    <div onclick="goNav('souls-build')" style="position:relative;overflow:hidden;background:#2F5D50;aspect-ratio:.72;padding:28px 26px;cursor:pointer;transition:filter .2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.filter='brightness(1.12)'" onmouseout="this.style.filter='brightness(1)'">
+      <svg style="position:absolute;bottom:0;left:0;width:100%;height:55%;opacity:.16;" viewBox="0 0 300 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 Q80 10 150 40 Q220 70 290 40" fill="none" stroke="#fff" stroke-width="8"/><path d="M10 70 Q80 40 150 70 Q220 100 290 70" fill="none" stroke="#fff" stroke-width="6"/><path d="M10 100 Q80 70 150 100 Q220 130 290 100" fill="none" stroke="#fff" stroke-width="5"/><path d="M10 130 Q80 100 150 130 Q220 160 290 130" fill="none" stroke="#fff" stroke-width="4"/><path d="M10 160 Q80 130 150 160 Q220 190 290 160" fill="none" stroke="#fff" stroke-width="3"/></svg>
+      <div style="position:relative;">
+        <div style="font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:10px;">Build</div>
+        <h3 style="font-family:var(--serif);font-size:clamp(28px,2.8vw,42px);font-weight:400;letter-spacing:-.025em;color:#ffffff;line-height:1.06;margin:0;">Through<br>Campaigns</h3>
+      </div>
+      <div style="position:relative;">
+        <p style="font-size:13px;line-height:1.72;color:rgba(255,255,255,0.72);margin-bottom:20px;">Get hands-on with real narrative projects. Join exclusive campaigns and activations run inside the Souls ecosystem — where your NDT skills meet real briefs, real brands, and real stakes.</p>
+        <span style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.6);display:inline-flex;align-items:center;gap:8px;">Know More <span style="display:inline-block;width:18px;height:1px;background:rgba(255,255,255,0.6);"></span></span>
+      </div>
+    </div>
+
+    <!-- EARN — #C5A25D -->
+    <div style="position:relative;overflow:hidden;background:#C5A25D;aspect-ratio:.72;padding:28px 26px;cursor:pointer;transition:filter .2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='brightness(1)'">
+      <svg style="position:absolute;bottom:0;right:0;width:75%;height:65%;opacity:.18;" viewBox="0 0 220 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="gd" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="9" cy="9" r="1.2" fill="#000"/></pattern></defs><rect width="220" height="200" fill="url(#gd)"/><rect x="110" y="40" width="80" height="80" fill="none" stroke="#000" stroke-width="1.5" transform="rotate(20,150,80)"/><rect x="126" y="56" width="48" height="48" fill="none" stroke="#000" stroke-width="1" transform="rotate(20,150,80)"/></svg>
+      <div style="position:relative;">
+        <div style="font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,0,0,0.45);margin-bottom:10px;">Earn</div>
+        <h3 style="font-family:var(--serif);font-size:clamp(28px,2.8vw,42px);font-weight:400;letter-spacing:-.025em;color:#0a0a0a;line-height:1.06;margin:0;">Through<br>First Voice</h3>
+      </div>
+      <div style="position:relative;">
+        <p style="font-size:13px;line-height:1.72;color:rgba(0,0,0,0.6);margin-bottom:20px;">Members-only campaigns with AI and Web3 companies looking for NDT-trained voices. Join exclusive activations, get discounted access to NDT certification, and earn through the narratives you help build.</p>
+        <span style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,0,0,0.5);display:inline-flex;align-items:center;gap:8px;">Know More <span style="display:inline-block;width:18px;height:1px;background:rgba(0,0,0,0.5);"></span></span>
+      </div>
+    </div>
+
+    <!-- GROW — #EBE2D9 -->
+    <div style="position:relative;overflow:hidden;background:#EBE2D9;aspect-ratio:.72;padding:28px 26px;cursor:pointer;transition:filter .2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.filter='brightness(.96)'" onmouseout="this.style.filter='brightness(1)'">
+      <svg style="position:absolute;bottom:-5%;right:-5%;width:65%;height:65%;opacity:.18;" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><g transform="translate(100,100)"><line x1="0" y1="0" x2="0" y2="-88" stroke="#000" stroke-width="6"/><line x1="0" y1="0" x2="62" y2="-62" stroke="#000" stroke-width="5"/><line x1="0" y1="0" x2="88" y2="0" stroke="#000" stroke-width="6"/><line x1="0" y1="0" x2="62" y2="62" stroke="#000" stroke-width="5"/><line x1="0" y1="0" x2="0" y2="88" stroke="#000" stroke-width="6"/><line x1="0" y1="0" x2="-62" y2="62" stroke="#000" stroke-width="5"/><line x1="0" y1="0" x2="-88" y2="0" stroke="#000" stroke-width="6"/><line x1="0" y1="0" x2="-62" y2="-62" stroke="#000" stroke-width="5"/><line x1="0" y1="0" x2="33" y2="-82" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="82" y2="-33" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="82" y2="33" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="33" y2="82" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="-33" y2="82" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="-82" y2="33" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="-82" y2="-33" stroke="#000" stroke-width="3"/><line x1="0" y1="0" x2="-33" y2="-82" stroke="#000" stroke-width="3"/></g></svg>
+      <div style="position:relative;">
+        <div style="font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(26,8,8,0.45);margin-bottom:10px;">Grow</div>
+        <h3 style="font-family:var(--serif);font-size:clamp(28px,2.8vw,42px);font-weight:400;letter-spacing:-.025em;color:#1a0808;line-height:1.06;margin:0;">Through<br>Community</h3>
+      </div>
+      <div style="position:relative;">
+        <p style="font-size:13px;line-height:1.72;color:rgba(26,8,8,0.6);margin-bottom:20px;">Practice NDT with a community of narrative designers, builders, and creators. Join exclusive IRL events, summits, and X Spaces — where the discipline is being shaped in real time, and your network compounds with every conversation.</p>
+        <span style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,8,8,0.5);display:inline-flex;align-items:center;gap:8px;">Know More <span style="display:inline-block;width:18px;height:1px;background:rgba(26,8,8,0.5);"></span></span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+@media(max-width:768px){
+  #souls-voices [style*="repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important;}
+  #souls-voices [style*="aspect-ratio:.72"]{aspect-ratio:.85!important;}
+}
+@media(max-width:480px){
+  #souls-voices [style*="repeat(4,1fr)"]{grid-template-columns:1fr!important;}
+}
+</style>
+
+<!-- ─── 5. X POSTS — native Twitter embeds ──────────────────── -->
+<section style="background:var(--found);padding:80px 52px;">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;flex-wrap:wrap;gap:16px;">
+    <div>
+      <p style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(235,226,217,0.26);margin-bottom:10px;">From The Community</p>
+      <h2 style="font-family:var(--serif);font-size:clamp(28px,3.5vw,48px);font-weight:400;letter-spacing:-.025em;color:var(--depth);line-height:1.06;">What members are saying on <em style="color:var(--energy);">X</em></h2>
+    </div>
+    <a href="https://x.com/SoulsLabs" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(235,226,217,0.36);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:color .2s;white-space:nowrap;" onmouseover="this.style.color='var(--depth)'" onmouseout="this.style.color='rgba(235,226,217,0.36)'">View all on X →</a>
+  </div>
+
+<style>
+/* Twitter embed grid */
+.tw-embed-grid {
+  columns: 3;
+  column-gap: 16px;
+}
+.tw-embed-wrap {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  display: block;
+}
+/* Override Twitter dark theme to match our dark background */
+.tw-embed-wrap .twitter-tweet {
+  margin: 0 !important;
+  width: 100% !important;
+}
+@media(max-width:1024px){ .tw-embed-grid { columns: 2; } }
+@media(max-width:600px){ .tw-embed-grid { columns: 1; } }
+</style>
+
+  <div class="tw-embed-grid">
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/SoulsLabs/status/2022294693552517442"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/iamdamilareeh/status/2028787336192930005"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Baheet_/status/2026656468364079464"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/LouyemaLo/status/2027079908426473879"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/erikhieubnb/status/2027323589431599338"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Miraletofdefi/status/2025898944463507856"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Deybola_w3/status/2026351567520079967"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Wisweb3/status/2028746886971019443"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Pretoria01/status/2025862658834981193"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/lucylovelyn/status/2026634715252371834"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/PinnacleCrypt/status/2027752181026189614"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/zhee_explores/status/2023636396582347108"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Twisterfx001/status/2026997174261764365"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/AmiliaD_/status/2029092325943644290"></a></blockquote></div>
+      <div class="tw-embed-wrap"><blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><a href="https://x.com/Joshy_159/status/2023656615224782873"></a></blockquote></div>
+  </div>
+
+  <!-- Twitter widget script — loads once -->
+  <script>
+  (function(){
+    if(window.__twLoaded) return;
+    window.__twLoaded = true;
+    var s = document.createElement('script');
+    s.src = 'https://platform.twitter.com/widgets.js';
+    s.async = true;
+    s.charset = 'utf-8';
+    s.onload = function(){ if(window.twttr && twttr.widgets) twttr.widgets.load(); };
+    document.head.appendChild(s);
+  })();
+  </script>
+</section>
+
+<!-- ─── 7. FINAL CTA ──────────────────────────────────────── -->
+<section style="background:var(--strategic);padding:96px 52px;text-align:center;border-top:1px solid rgba(235,226,217,0.06);">
+  <h2 style="font-family:var(--serif);font-size:clamp(36px,5.5vw,76px);font-weight:400;line-height:1.04;letter-spacing:-.035em;color:var(--depth);max-width:620px;margin:0 auto 18px;">Join the <em style="color:var(--energy);">conversation.</em></h2>
+  <p style="font-size:14px;color:rgba(235,226,217,0.4);max-width:360px;margin:0 auto 36px;line-height:1.78;">Invite-only. Apply with a short note about your work and why narrative design matters to you.</p>
+  <span style="background:var(--fire);color:var(--depth);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:14px 36px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:background .2s;" onmouseover="this.style.background='#5a0505'" onmouseout="this.style.background='var(--fire)'">Apply to Souls Voices →</span>
+</section>
+
+<footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Voices</a><a onclick="goNav('souls-build')">Souls Build</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+
+<!-- ══ SOULS BUILD ══ -->
+<!-- ══ SOULS BUILD ══ -->
+<div id="souls-build" class="page">
+
+<!-- HERO — full-width background image with centered content -->
+<section style="min-height:100vh;background:var(--found);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 52px 80px;position:relative;overflow:hidden;">
+  <!-- NEW HERO IMAGE -->
+  <div style="position:absolute;inset:0;overflow:hidden;">
+    <img src="souls-build-hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center;opacity:0.85;"/>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,4,6,0.45) 0%,rgba(4,4,6,0.55) 40%,rgba(4,4,6,0.72) 100%);"></div>
+  </div>
+  <button class="sp-back" style="position:absolute;top:32px;left:52px;color:rgba(235,226,217,0.5);" onclick="goNav('home')">← Home</button>
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(235,226,217,0.45);margin-bottom:36px;position:relative;">Program — Venture Studio</div>
+  <!-- (1+2) H1: Albra Sans = var(--serif), colors per spec -->
+  <h1 style="font-family:var(--serif);font-size:clamp(52px,7vw,110px);font-weight:400;line-height:1.0;letter-spacing:-.035em;max-width:900px;position:relative;margin-bottom:28px;">
+    <span style="color:#EBE2D9;">A narrative-first studio<br>for founders who know</span><br>
+    <em style="color:#720606;font-style:italic;">story is the strategy.</em>
+  </h1>
+  <!-- (2) Lead paragraph: Helvetica Neue = var(--sans), #EBE2D9 -->
+  <p style="font-family:var(--sans);font-size:17px;line-height:1.75;color:#EBE2D9;max-width:560px;margin:0 auto 48px;position:relative;opacity:.85;">We co-build products, protocols, and companies from day zero — embedding narrative design alongside technical teams as co-builders, not consultants.</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;">
+    <span style="background:#EBE2D9;color:#720606;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 32px;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#d4ccbf'" onmouseout="this.style.background='#EBE2D9'">Nominate or apply →</span>
+    <span style="border:1px solid rgba(235,226,217,0.3);color:rgba(235,226,217,0.7);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 32px;cursor:pointer;">Stay in the know →</span>
+  </div>
+</section>
+
+<!-- PHOTO GRID of builders — event/workshop/talk show images -->
+<section style="background:var(--found);padding:0;overflow:hidden;">
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;">
+
+    <!-- Row 1 -->
+    <div style="aspect-ratio:1;overflow:hidden;position:relative;">
+      <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.75) saturate(.9);transition:filter .4s;" onmouseover="this.style.filter='brightness(.9) saturate(1)'" onmouseout="this.style.filter='brightness(.75) saturate(.9)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.85);transition:filter .4s;" onmouseover="this.style.filter='brightness(.88) saturate(1)'" onmouseout="this.style.filter='brightness(.7) saturate(.85)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1558008258-3256797b43f3?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.88);transition:filter .4s;" onmouseover="this.style.filter='brightness(.9) saturate(1)'" onmouseout="this.style.filter='brightness(.72) saturate(.88)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.85);transition:filter .4s;" onmouseover="this.style.filter='brightness(.88) saturate(1)'" onmouseout="this.style.filter='brightness(.7) saturate(.85)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.88);transition:filter .4s;" onmouseover="this.style.filter='brightness(.9) saturate(1)'" onmouseout="this.style.filter='brightness(.72) saturate(.88)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.85);transition:filter .4s;" onmouseover="this.style.filter='brightness(.88) saturate(1)'" onmouseout="this.style.filter='brightness(.7) saturate(.85)'"/>
+    </div>
+
+    <!-- Row 2 -->
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1559223607-a43c990c692c?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.85);transition:filter .4s;" onmouseover="this.style.filter='brightness(.88) saturate(1)'" onmouseout="this.style.filter='brightness(.7) saturate(.85)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.88);transition:filter .4s;" onmouseover="this.style.filter='brightness(.9) saturate(1)'" onmouseout="this.style.filter='brightness(.72) saturate(.88)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.85);transition:filter .4s;" onmouseover="this.style.filter='brightness(.88) saturate(1)'" onmouseout="this.style.filter='brightness(.7) saturate(.85)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.88);transition:filter .4s;" onmouseover="this.style.filter='brightness(.9) saturate(1)'" onmouseout="this.style.filter='brightness(.72) saturate(.88)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1543269664-7eef42226a21?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.85);transition:filter .4s;" onmouseover="this.style.filter='brightness(.88) saturate(1)'" onmouseout="this.style.filter='brightness(.7) saturate(.85)'"/>
+    </div>
+    <div style="aspect-ratio:1;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&q=80" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.88);transition:filter .4s;" onmouseover="this.style.filter='brightness(.9) saturate(1)'" onmouseout="this.style.filter='brightness(.72) saturate(.88)'"/>
+    </div>
+
+  </div>
+</section>
+
+<!-- MANIFESTO STATEMENT — large centered -->
+<section style="background:var(--found);padding:100px 52px;text-align:center;border-top:1px solid rgba(235,226,217,0.06);">
+  <!-- (2) Albra Sans = var(--serif), #EBE2D9 -->
+  <h2 style="font-family:var(--serif);font-size:clamp(32px,4.5vw,68px);font-weight:400;line-height:1.08;letter-spacing:-.03em;color:#EBE2D9;max-width:900px;margin:0 auto 32px;">Every journey accelerates when you're surrounded by the right people from day one.</h2>
+  <!-- (2) Helvetica Neue = var(--sans), #EBE2D9 -->
+  <p style="font-family:var(--sans);font-size:15px;line-height:1.78;color:#EBE2D9;max-width:560px;margin:0 auto 48px;opacity:.75;">We partner with 3–5 founders per cohort, embedding a narrative designer alongside their technical team. We bring NDT methodology, our network, and media infrastructure — in exchange for equity and the right to tell their story.</p>
+  <!-- (2) Apply to join: #720606 -->
+  <a style="font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#720606;cursor:pointer;display:inline-flex;align-items:center;gap:12px;">Apply to join <span style="display:inline-block;width:32px;height:1px;background:#720606;"></span></a>
+</section>
+
+<!-- WHO IS THIS FOR — numbered sections like a16z -->
+<section style="background:var(--depth);padding:100px 52px;">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--fire);margin-bottom:52px;display:flex;align-items:center;gap:14px;"><span style="width:28px;height:1px;background:var(--fire);display:inline-block;"></span>WHO IS THIS FOR</div>
+  <!-- (3) 2 cards: Founders + Joiners, plus location note -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:32px;">
+    <div style="background:rgba(114,6,6,0.05);padding:52px 44px;border-top:2px solid var(--fire);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:.14em;margin-bottom:24px;">01</div>
+      <h3 style="font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;color:var(--text);margin-bottom:16px;">Founders</h3>
+      <p style="font-size:14px;line-height:1.78;color:var(--muted);">You're committed to building something new at the frontier of Web3 or AI. You understand that narrative is infrastructure — not marketing. You want a narrative co-builder from day one.</p>
+    </div>
+    <div style="background:rgba(114,6,6,0.04);padding:52px 44px;border-top:2px solid rgba(114,6,6,0.15);">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:.14em;margin-bottom:24px;">02</div>
+      <h3 style="font-family:var(--serif);font-size:28px;font-weight:500;letter-spacing:-.02em;color:var(--text);margin-bottom:16px;">Joiners</h3>
+      <p style="font-size:14px;line-height:1.78;color:var(--muted);">You want to work with an incredible founder from day one to help build the next groundbreaking company.</p>
+    </div>
+  </div>
+  <!-- Location note -->
+  <p style="font-family:var(--serif);font-size:17px;font-weight:400;color:var(--muted);text-align:center;max-width:680px;margin:0 auto;line-height:1.7;">Most community gatherings will be in <strong style="color:var(--text);font-weight:500;">Vietnam and Singapore</strong>, but you can be based anywhere.</p>
+</section>
+
+<!-- HOW IT WORKS — numbered like a16z Build -->
+<section style="background:rgba(114,6,6,0.03);padding:100px 52px;">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--fire);margin-bottom:52px;display:flex;align-items:center;gap:14px;"><span style="width:28px;height:1px;background:var(--fire);display:inline-block;"></span>HOW IT WORKS</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+    <div style="padding:44px 36px;border-top:1px solid rgba(114,6,6,0.12);">
+      <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:14px;">Narrative-First Strategy</h3>
+      <p style="font-size:13px;line-height:1.78;color:var(--muted);">Story architecture from day zero, not day 100. We design the founding narrative before you build the product — so every decision serves the story.</p>
+    </div>
+    <div style="padding:44px 36px;border-top:1px solid rgba(114,6,6,0.12);">
+      <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:14px;">Embedded NDT Designer</h3>
+      <p style="font-size:13px;line-height:1.78;color:var(--muted);">A co-founder-level narrative partner — in your Slack, your sprints, and your board meetings. Not advisory. Embedded.</p>
+    </div>
+    <div style="padding:44px 36px;border-top:1px solid rgba(114,6,6,0.12);">
+      <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:14px;">Web3 & AI Network</h3>
+      <p style="font-size:13px;line-height:1.78;color:var(--muted);">Warm introductions to the right VCs, protocols, and builders. We've been in this ecosystem for years. You benefit from day one.</p>
+    </div>
+    <div style="padding:44px 36px;border-top:1px solid rgba(114,6,6,0.12);">
+      <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:14px;">Media Infrastructure</h3>
+      <p style="font-size:13px;line-height:1.78;color:var(--muted);">Launch narrative, press relationships, community activation, and content distribution — all pre-built and ready when you need it.</p>
+    </div>
+    <div style="padding:44px 36px;border-top:1px solid rgba(114,6,6,0.12);">
+      <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:14px;">SoulsU Network</h3>
+      <p style="font-size:13px;line-height:1.78;color:var(--muted);">Access to trained narrative designers as your team grows. Never build without a narrative-capable person in the room again.</p>
+    </div>
+    <div style="padding:44px 36px;border-top:1px solid rgba(114,6,6,0.12);">
+      <h3 style="font-family:var(--serif);font-size:20px;font-weight:500;color:var(--text);margin-bottom:14px;">Long-term Partnership</h3>
+      <p style="font-size:13px;line-height:1.78;color:var(--muted);">We stay in — through launch, ecosystem expansion, and the long arc. Not just for the announcement. For the whole story.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ ACCORDION -->
+<section style="background:var(--depth);padding:80px 52px;">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--fire);margin-bottom:40px;display:flex;align-items:center;gap:14px;"><span style="width:28px;height:1px;background:var(--fire);display:inline-block;"></span>FAQS</div>
+  <div style="max-width:720px;">
+    <div class="sb-faq-item" style="border-top:1px solid rgba(114,6,6,0.12);padding:24px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:var(--serif);font-size:18px;color:var(--text);" onclick="toggleFaq(this)">
+        What stage are most Souls Build companies at? <span style="color:var(--fire);font-size:20px;transition:transform .2s;">+</span>
+      </div>
+      <div class="sb-faq-body" style="display:none;padding-top:16px;font-size:14px;line-height:1.78;color:var(--muted);">We work with founders at the very earliest stages — idea, pre-product, pre-seed. The narrative challenge is hardest and most important at day one. That's where we're most useful.</div>
+    </div>
+    <div class="sb-faq-item" style="border-top:1px solid rgba(114,6,6,0.12);padding:24px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:var(--serif);font-size:18px;color:var(--text);" onclick="toggleFaq(this)">
+        What does Souls Build take in return? <span style="color:var(--fire);font-size:20px;transition:transform .2s;">+</span>
+      </div>
+      <div class="sb-faq-body" style="display:none;padding-top:16px;font-size:14px;line-height:1.78;color:var(--muted);">We take equity — typically a small percentage consistent with early co-builder arrangements. And we take the right to tell your story with the full Souls Lab media infrastructure.</div>
+    </div>
+    <div class="sb-faq-item" style="border-top:1px solid rgba(114,6,6,0.12);border-bottom:1px solid rgba(114,6,6,0.12);padding:24px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:var(--serif);font-size:18px;color:var(--text);" onclick="toggleFaq(this)">
+        How do I apply to Souls Build? <span style="color:var(--fire);font-size:20px;transition:transform .2s;">+</span>
+      </div>
+      <div class="sb-faq-body" style="display:none;padding-top:16px;font-size:14px;line-height:1.78;color:var(--muted);">Tell us what you're building and why it matters. We review every application personally. We care most about the ambition, the market, and whether you understand that story is as important as code.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="background:var(--found);padding:100px 52px;text-align:center;border-top:1px solid rgba(235,226,217,0.06);">
+  <!-- (4) Albra Sans = var(--serif), colors per spec -->
+  <h2 style="font-family:var(--serif);font-size:clamp(36px,5vw,72px);font-weight:400;line-height:1.05;letter-spacing:-.03em;max-width:700px;margin:0 auto 20px;">
+    <span style="color:#EBE2D9;">Build something<br></span>
+    <em style="color:#720606;font-style:italic;">worth the story.</em>
+  </h2>
+  <!-- (4) Helvetica Neue = var(--sans), #EBE2D9 -->
+  <p style="font-family:var(--sans);font-size:14px;color:#EBE2D9;max-width:420px;margin:0 auto 40px;line-height:1.78;opacity:.72;">Private, invite-only. If you're building at the frontier of Web3 or AI, we want to hear from you.</p>
+  <span style="background:#EBE2D9;color:#720606;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:14px 36px;cursor:pointer;display:inline-block;transition:background .2s;" onmouseover="this.style.background='#d4ccbf'" onmouseout="this.style.background='#EBE2D9'">Apply to Souls Build →</span>
+</section>
+
+<footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Voices</a><a onclick="goNav('souls-build')">Souls Build</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ COMPANY: TEAM ══ -->
+<!-- ══ COMPANY: TEAM ══ -->
+<div id="company-team" class="page">
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('team-hero.jpg');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Company</div>
+      <h1 class="sp-glass-h1">The people behind<br><em>the narrative.</em></h1>
+      <p class="sp-glass-lead">Souls Lab is built by narrative designers, Web3 veterans, and technology strategists who believe that story is the most undervalued asset in the decentralized economy.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>See Open Roles</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="s-eyebrow">Leadership</div>
+    <h2 class="s-h2">Founders &<br><em>core team.</em></h2>
+    <div class="col3" style="margin-top:52px;">
+      <div class="aud">
+        <div class="aud-tag">Co-Founder & CEO</div>
+        <div class="aud-title">Anh Le</div>
+        <div class="aud-body">Pioneer of Narrative Design Thinking. Former strategy lead across blockchain foundations and AI enterprises. Believes the gap between great technology and great adoption is always a story problem.</div>
+      </div>
+      <div class="aud">
+        <div class="aud-tag">Head of NDT</div>
+        <div class="aud-title">Narrative Design Lead</div>
+        <div class="aud-body">Leads methodology development and client narrative architecture. Trained in design thinking, cognitive framing, and the specific storytelling challenges of decentralized systems.</div>
+      </div>
+      <div class="aud">
+        <div class="aud-tag">Head of Programs</div>
+        <div class="aud-title">Programs Director</div>
+        <div class="aud-body">Oversees SoulsU curriculum, Souls Voices community, and Souls Build cohort selection. Deep background in education design and practitioner training.</div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-strip reveal" style="background:var(--strategic);">
+    <h2 class="cta-h">Want to join<br>the <em>team?</em></h2>
+    <p class="cta-sub">We're always looking for narrative designers, community builders, and operators who want to work at the frontier.</p>
+    <div class="cta-btns">
+      <span class="btn-p" onclick="goNav('company-jobs')">See Open Roles →</span>
+      <span class="btn-o" onclick="goNav('home')">← Back to Home</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Company</h4><a onclick="goNav('company-team')">Team</a><a onclick="goNav('company-about')">About</a><a onclick="goNav('company-jobs')">Jobs</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ COMPANY: ABOUT ══ -->
+<div id="company-about" class="page">
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('about-hero.jpg');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Company</div>
+      <h1 class="sp-glass-h1">Why we built<br><em>Souls Lab.</em></h1>
+      <p class="sp-glass-lead">In 2023, we looked at the Web3 ecosystem and saw the same problem everywhere: brilliant technology, invisible narrative. We built Souls Lab to close that gap.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>Read Our Manifesto</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="col2" style="margin-top:0;gap:80px;">
+      <div>
+        <div class="s-eyebrow">Our Origin</div>
+        <h2 class="s-h2">The narrative gap<br>is <em>real — and costly.</em></h2>
+        <div class="s-body" style="margin-top:28px;">
+          <p>We built Souls Lab to close that gap. To bring the rigor of design thinking to the art of storytelling. To treat narrative not as a marketing add-on but as core infrastructure — as important as the technology itself.</p>
+          <p>Today we work with some of the most important protocols, funds, and enterprises in Web3 and AI. The work is hard. The stakes are high. And the methodology — Narrative Design Thinking — continues to evolve with every engagement.</p>
+        </div>
+      </div>
+      <div>
+        <div class="s-eyebrow" style="margin-bottom:28px;">Our Beliefs</div>
+        <div class="included-list">
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Story is design</strong> — not talent, not luck, not inspiration</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Narrative authority compounds</strong> — it is built over months, not moments</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Embedded beats advisory</strong> — you cannot design a culture you haven't felt</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>Belief is measurable</strong> — conviction density is a real metric, not a vibe</div></div>
+          <div class="included-item"><span class="included-icon">→</span><div class="included-text"><strong>The frontier needs better stories</strong> — Web3 and AI will only reach their potential if they earn trust</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="manifesto reveal" style="padding:120px 52px;">
+    <div class="s-eyebrow" style="color:rgba(235,226,217,0.4);">Our Manifesto</div>
+    <blockquote class="manifesto-q">"Every round has a technical thesis and a human story. The technical thesis gets you the meeting. <em>The human story closes the round.</em>"</blockquote>
+    <div class="manifesto-attr">— Souls Lab, Narrative Design Thinking for Web3 Capital, 2025</div>
+    <div class="manifesto-ctas">
+      <span class="btn-p" onclick="goNav('ndt-alliance')">Work with us →</span>
+      <span class="btn-o" onclick="goNav('home')">← Back to Home</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Company</h4><a onclick="goNav('company-team')">Team</a><a onclick="goNav('company-about')">About</a><a onclick="goNav('company-jobs')">Jobs</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+<!-- ══ COMPANY: JOBS ══ -->
+<div id="company-jobs" class="page">
+    <section class="sp-hero">
+    <div class="sp-hero-bg" style="background-image:url('jobs-hero.jpg');"></div>
+    <div class="sp-hero-overlay"></div>
+    <button class="sp-back" onclick="goNav('home')">← Home</button>
+    <div class="sp-glass au au-1">
+      <div class="sp-glass-tag">Company</div>
+      <h1 class="sp-glass-h1">Work at the<br><em>frontier.</em></h1>
+      <p class="sp-glass-lead">We hire people who believe that story is the most undervalued asset in technology. If that's you, we'd love to hear from you.</p>
+      <span class="sp-glass-cta"><span class="cta-line"></span>See Open Roles</span>
+    </div>
+    <div class="sp-counter">Souls Lab — 2025</div>
+  </section>
+  <section class="section bg-cream reveal">
+    <div class="col2" style="margin-top:0;gap:80px;align-items:start;">
+      <div>
+        <div class="s-eyebrow">Open Roles</div>
+        <h2 class="s-h2">Who we're<br><em>looking for.</em></h2>
+        <div class="s-body" style="margin-top:28px;">
+          <p>We don't hire for jobs — we hire for missions. Every person at Souls Lab owns a narrative, a domain, and a relationship with the ecosystem we serve.</p>
+          <p>If you don't see a role that fits but you believe deeply in what we're building, send us a note anyway. The best hires usually create their own role.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;margin-top:0;">
+        <div class="svc-card" style="cursor:default;">
+          <div class="svc-card-num">OPEN</div>
+          <h3 class="svc-card-title">Forward-Deployed Narrative Designer</h3>
+          <p class="svc-card-body">Embedded in client organizations. 2–5 years experience in writing, strategy, or design. Deep curiosity about Web3 or AI. Full-time, remote-first.</p>
+          <div class="svc-card-tags"><span class="svc-tag">Full-time</span><span class="svc-tag">Remote</span><span class="svc-tag">Web3</span></div>
+        </div>
+        <div class="svc-card" style="cursor:default;">
+          <div class="svc-card-num">OPEN</div>
+          <h3 class="svc-card-title">SoulsU Curriculum Designer</h3>
+          <p class="svc-card-body">Build the world's first narrative design certification. Experience in curriculum design and adult learning. Passion for practitioner education.</p>
+          <div class="svc-card-tags"><span class="svc-tag">Full-time</span><span class="svc-tag">Remote</span><span class="svc-tag">Education</span></div>
+        </div>
+        <div class="svc-card" style="cursor:default;">
+          <div class="svc-card-num">OPEN</div>
+          <h3 class="svc-card-title">Community Lead — Souls Voices</h3>
+          <p class="svc-card-body">Own and grow the Souls Voices practitioner community. Experience building online communities for creative or technical professionals.</p>
+          <div class="svc-card-tags"><span class="svc-tag">Full-time</span><span class="svc-tag">Remote</span><span class="svc-tag">Community</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-strip reveal" style="background:var(--strategic);">
+    <h2 class="cta-h">Don't see<br>your <em>role?</em></h2>
+    <p class="cta-sub">Send us a note about yourself and why Souls Lab. The best hires create their own position.</p>
+    <div class="cta-btns">
+      <span class="btn-p">Send an open application →</span>
+      <span class="btn-o" onclick="goNav('home')">← Back to Home</span>
+    </div>
+  </section>
+  <footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Company</h4><a onclick="goNav('company-team')">Team</a><a onclick="goNav('company-about')">About</a><a onclick="goNav('company-jobs')">Jobs</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+
+<!-- ══ CASE STUDIES ══ -->
+<div id="case-studies" class="page">
+<style>
+/* ── CASE STUDIES PAGE STYLES ──────────────────── */
+#case-studies { background:var(--depth); color:var(--text); }
+
+.cs-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  margin-top:0;
+}
+.cs-card {
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  padding:40px 36px 36px;
+  cursor:pointer;
+  transition:background .2s;
+  text-decoration:none;
+  color:inherit;
+  border-bottom:1px solid rgba(26,8,8,0.07);
+}
+.cs-card:hover { background:var(--depth); }
+.cs-card:hover .cs-read { gap:14px; }
+.cs-logo-area {
+  height:56px;
+  display:flex;
+  align-items:center;
+  margin-bottom:28px;
+}
+.cs-logo-placeholder {
+  font-family:var(--serif);
+  font-size:22px;
+  font-weight:500;
+  color:var(--text);
+  letter-spacing:-.02em;
+  opacity:.7;
+}
+.cs-category {
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--fire);
+  margin-bottom:12px;
+}
+.cs-title {
+  font-family:var(--serif);
+  font-size:19px;
+  font-weight:500;
+  color:var(--text);
+  line-height:1.3;
+  letter-spacing:-.01em;
+  margin-bottom:12px;
+  flex:1;
+}
+.cs-read {
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--fire);
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:gap .2s;
+  margin-top:20px;
+}
+.cs-read span { display:inline-block; width:20px; height:1px; background:var(--fire); }
+
+/* Filter tags */
+.cs-filters {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:52px;
+}
+.cs-filter-btn {
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border:1px solid rgba(26,8,8,0.15);
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  transition:all .2s;
+}
+.cs-filter-btn:hover, .cs-filter-btn.active {
+  background:var(--fire);
+  color:var(--depth);
+  border-color:var(--fire);
+}
+
+/* Featured first card — spans 2 cols */
+.cs-featured {
+  grid-column: 1 / 3;
+  flex-direction:row;
+  align-items:center;
+  gap:48px;
+  padding:52px 48px;
+  background:var(--found);
+  color:var(--depth);
+}
+.cs-featured:hover { background:#0e0c0a; }
+.cs-featured .cs-logo-placeholder { color:var(--depth); opacity:.6; }
+.cs-featured .cs-category { color:var(--energy); }
+.cs-featured .cs-title { font-size:28px; color:var(--depth); flex:none; max-width:380px; }
+.cs-featured .cs-read { color:var(--depth); }
+.cs-featured .cs-read span { background:var(--depth); }
+.cs-featured .cs-img {
+  flex:1;
+  aspect-ratio:16/10;
+  overflow:hidden;
+  min-width:0;
+}
+.cs-featured .cs-img img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:brightness(.7);
+}
+
+@media(max-width:1024px){
+  .cs-grid { grid-template-columns:1fr 1fr; }
+  .cs-featured { grid-column:1/3; flex-direction:column; }
+}
+@media(max-width:600px){
+  .cs-grid { grid-template-columns:1fr; }
+  .cs-featured { grid-column:1; }
+}
+</style>
+
+<!-- HERO -->
+<section style="background:var(--depth);padding:140px 52px 72px;">
+  <button class="sp-back light" onclick="goNav('home')">← Home</button>
+  <div style="max-width:900px;">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--fire);margin-bottom:20px;display:flex;align-items:center;gap:14px;"><span style="width:28px;height:1px;background:var(--fire);display:inline-block;"></span>Case Studies & Stories</div>
+    <h1 style="font-family:var(--serif);font-size:clamp(44px,6vw,88px);font-weight:400;line-height:.97;letter-spacing:-.03em;color:var(--text);margin-bottom:24px;">Read about how<br>narrative <em style="color:var(--fire);font-style:italic;">changed the game</em><br>for our partners.</h1>
+    <p style="font-size:16px;line-height:1.78;color:var(--muted);max-width:540px;">From Web3 protocols to AI enterprises and venture funds — here's how Narrative Design Thinking moved the needle in real engagements.</p>
+  </div>
+</section>
+
+<!-- FILTER TAGS + GRID -->
+<section style="background:var(--depth);padding:0 52px 100px;">
+
+  <!-- Filter bar -->
+  <div class="cs-filters">
+    <button class="cs-filter-btn active" onclick="filterCS(this,'all')">All Stories</button>
+    <button class="cs-filter-btn" onclick="filterCS(this,'vc')">VC & Funds</button>
+    <button class="cs-filter-btn" onclick="filterCS(this,'web3')">Web3 Protocols</button>
+    <button class="cs-filter-btn" onclick="filterCS(this,'enterprise')">AI Enterprise</button>
+    <button class="cs-filter-btn" onclick="filterCS(this,'community')">Community</button>
+  </div>
+
+  <!-- GRID -->
+  <div class="cs-grid" id="cs-grid">
+
+    <!-- FEATURED — case study 01 -->
+    <div class="cs-card cs-featured" data-cat="vc" onclick="goNav('cs-detail-1')">
+      <div>
+        <div class="cs-logo-placeholder">Momentum Fund</div>
+        <div class="cs-category" style="margin-top:20px;">VC — Narrative Audit</div>
+        <div class="cs-title">How a $120M Web3 fund rebuilt its thesis narrative and tripled LP re-up rate in one cycle.</div>
+        <div class="cs-read"><span></span>Read Case Study</div>
+      </div>
+      <div class="cs-img">
+        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80" alt="Momentum Fund"/>
+      </div>
+    </div>
+
+    <!-- Case study 02 -->
+    <div class="cs-card" data-cat="web3" onclick="goNav('cs-detail-2')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">ChainLayer</div></div>
+      <div class="cs-category">Web3 Protocol — GTM Narrative</div>
+      <div class="cs-title">How ChainLayer launched its L2 with a genesis narrative that made validators choose them before mainnet.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 03 -->
+    <div class="cs-card" data-cat="enterprise" onclick="goNav('cs-detail-3')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">VerifyAI</div></div>
+      <div class="cs-category">AI Enterprise — NDT Alliance</div>
+      <div class="cs-title">Embedding a narrative designer inside VerifyAI's product team for 6 months — and what happened next.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 04 -->
+    <div class="cs-card" data-cat="vc" onclick="goNav('cs-detail-4')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">DeltaVC</div></div>
+      <div class="cs-category">VC — New Media Package</div>
+      <div class="cs-title">Crystallizing Delta's investment thesis into a single document that every founder in the ecosystem started quoting.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 05 -->
+    <div class="cs-card" data-cat="web3" onclick="goNav('cs-detail-5')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">Orbis Protocol</div></div>
+      <div class="cs-category">Web3 Protocol — Tokenomics Narrative</div>
+      <div class="cs-title">Designing the economic story for Orbis's token launch — and why it survived the bear market.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 06 -->
+    <div class="cs-card" data-cat="enterprise" onclick="goNav('cs-detail-6')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">Synthos</div></div>
+      <div class="cs-category">AI Enterprise — Category Design</div>
+      <div class="cs-title">Helping Synthos define and own the "verifiable AI" category before any competitor could frame it first.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 07 -->
+    <div class="cs-card" data-cat="community" onclick="goNav('souls-voices')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">Souls Voices</div></div>
+      <div class="cs-category">Community — Narrative Design</div>
+      <div class="cs-title">Building narrative authority across 500+ practitioners — and what makes a community actually believe in its mission.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 08 -->
+    <div class="cs-card" data-cat="vc" onclick="goNav('cs-detail-8')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">KairosV</div></div>
+      <div class="cs-category">VC — LP Communication Design</div>
+      <div class="cs-title">Redesigning Kairos's quarterly LP update to be read, trusted, and forwarded — not filed.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+    <!-- Case study 09 -->
+    <div class="cs-card" data-cat="web3" onclick="goNav('cs-detail-9')">
+      <div class="cs-logo-area"><div class="cs-logo-placeholder">Polarus DAO</div></div>
+      <div class="cs-category">Web3 — Governance Story</div>
+      <div class="cs-title">Designing the participation narrative that turned passive token holders into active governance contributors.</div>
+      <div class="cs-read"><span></span>Read Case Study</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA STRIP -->
+<section style="background:var(--strategic);padding:96px 52px;text-align:center;border-top:1px solid rgba(235,226,217,0.07);">
+  <h2 style="font-family:var(--serif);font-size:clamp(32px,4.5vw,68px);font-weight:400;line-height:1.06;letter-spacing:-.03em;color:var(--depth);max-width:680px;margin:0 auto 18px;">Your story could be next.</h2>
+  <p style="font-size:14px;color:rgba(235,226,217,0.45);max-width:400px;margin:0 auto 36px;line-height:1.78;">Limited NDT Alliance and New Media Package engagements per quarter. Applications reviewed personally.</p>
+  <span style="background:var(--depth);color:var(--fire);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:14px 36px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;" onclick="goNav('ndt-alliance')">Apply to Work with Us →</span>
+</section>
+
+<footer><div class="ft-grid"><div><div class="ft-brand">Souls Lab</div><div class="ft-tag">Narrative Design Thinking for the decentralized economy.</div></div><div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">NDT for VCs</a><a onclick="goNav('web3')">NDT for Web3</a><a onclick="goNav('case-studies')">Case Studies</a></div><div class="ft-col"><h4>Home</h4><a onclick="goNav('home')">← Souls Lab</a></div></div><div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab</div></div></footer>
+</div>
+
+
+<script>
+/* ── CURSOR ─────────────────────────── */
+const cur=document.getElementById('cur'), ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){
+  rx+=(mx-rx)*.13; ry+=(my-ry)*.13;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(loop);
+})();
+
+/* ── DROPDOWN NAV — JS-controlled hover with close-delay ── */
+const nav=document.getElementById('nav');
+const mobileNav=document.getElementById('mobileNav');
+const hamburger=document.getElementById('hamburger');
+
+// Close delay prevents dropdown from flickering when mouse
+// crosses the invisible bridge between trigger and panel
+let closeTimers = {};
+
+document.querySelectorAll('.nav-item.has-drop').forEach(function(item) {
+  const id = item.id || Math.random();
+
+  item.addEventListener('mouseenter', function() {
+    // Cancel any pending close
+    clearTimeout(closeTimers[id]);
+    // Close all other dropdowns first
+    document.querySelectorAll('.nav-item.has-drop.drop-open').forEach(function(other) {
+      if (other !== item) other.classList.remove('drop-open');
+    });
+    item.classList.add('drop-open');
+  });
+
+  item.addEventListener('mouseleave', function() {
+    // Delay close by 120ms — covers any sub-pixel gap
+    closeTimers[id] = setTimeout(function() {
+      item.classList.remove('drop-open');
+    }, 120);
+  });
+
+  // If mouse re-enters the dropdown panel, cancel close
+  const drop = item.querySelector('.nav-drop');
+  if (drop) {
+    drop.addEventListener('mouseenter', function() {
+      clearTimeout(closeTimers[id]);
+    });
+    drop.addEventListener('mouseleave', function() {
+      closeTimers[id] = setTimeout(function() {
+        item.classList.remove('drop-open');
+      }, 120);
+    });
+  }
+});
+
+// Close all dropdowns on click outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav-item.has-drop')) {
+    document.querySelectorAll('.nav-item.has-drop.drop-open').forEach(function(item) {
+      item.classList.remove('drop-open');
+    });
+  }
+});
+
+/* ── NAV STYLE ────────────────────────── */
+const DARK_PAGES=['vc','enterprise','web3','soulsu','svc-vietnam','svc-social','svc-video','svc-fullstack','ndt-alliance','souls-voices','souls-build','company-team','company-jobs'];
+
+const NAV_MAP={
+  'home':          'nav-home',
+  'vc':            'nav-services',
+  'web3':          'nav-services',
+  'enterprise':    'nav-services',
+  'case-studies':  'nav-services',
+  'svc-vietnam':   'nav-services',
+  'svc-social':    'nav-services',
+  'svc-video':     'nav-services',
+  'svc-fullstack': 'nav-services',
+  'ndt-alliance':  'nav-ndt-alliance',
+  'soulsu':        'nav-programs',
+  'souls-voices':  'nav-programs',
+  'souls-build':   'nav-programs',
+  'company-team':  'nav-company',
+  'company-about': 'nav-company',
+  'company-jobs':  'nav-company'
+};
+
+function updateNavStyle(pageId){
+  const isDark = DARK_PAGES.includes(pageId);
+  nav.classList.toggle('dark-nav', isDark);
+  hamburger.style.color = isDark ? 'rgba(235,226,217,0.7)' : '';
+  mobileNav.classList.toggle('dark-mode', isDark);
+  // active links
+  document.querySelectorAll('.nav-item > a, .nav-drop a').forEach(a=>a.classList.remove('active-link'));
+  const groupId = NAV_MAP[pageId];
+  if (groupId) { const el=document.getElementById(groupId); if(el) el.classList.add('active-link'); }
+  const directId = 'nav-'+pageId;
+  const direct = document.getElementById(directId);
+  if (direct) direct.classList.add('active-link');
+}
+
+/* ── MOBILE NAV ─────────────────────── */
+function toggleMobileNav(){
+  const isOpen = mobileNav.classList.toggle('open');
+  hamburger.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+function closeMobileNav(){
+  mobileNav.classList.remove('open');
+  hamburger.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function toggleMobileSub(id){
+  const sub = document.getElementById(id);
+  if(sub) sub.classList.toggle('open');
+}
+
+/* ── ROUTER ─────────────────────────── */
+function go(id){
+  // Close any open dropdowns
+  document.querySelectorAll('.nav-item.has-drop.drop-open').forEach(function(item){
+    item.classList.remove('drop-open');
+  });
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  document.querySelectorAll('#'+id+' .au').forEach(el=>{
+    el.style.animation='none'; el.offsetHeight; el.style.animation='';
+  });
+  updateNavStyle(id);
+  // Reload Twitter widgets when navigating to souls-voices
+  if(id === 'souls-voices'){
+    setTimeout(function(){
+      if(window.twttr && twttr.widgets){
+        twttr.widgets.load();
+      } else if(!window.__twLoaded){
+        window.__twLoaded = true;
+        var s=document.createElement('script');
+        s.src='https://platform.twitter.com/widgets.js';
+        s.async=true; s.charset='utf-8';
+        s.onload=function(){ if(window.twttr && twttr.widgets) twttr.widgets.load(); };
+        document.head.appendChild(s);
+      }
+    }, 200);
+  }
+  setTimeout(observeReveals, 60);
+}
+function goNav(id){ go(id); }
+
+function filterCS(btn, cat) {
+  document.querySelectorAll('.cs-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.cs-card').forEach(function(card){
+    if(cat === 'all' || card.dataset.cat === cat){
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+
+function toggleFaq(el){
+  var body=el.nextElementSibling;
+  var icon=el.querySelector('span:last-child');
+  var isOpen=body.style.display==='block';
+  document.querySelectorAll('.sb-faq-body').forEach(function(b){b.style.display='none';});
+  document.querySelectorAll('.sb-faq-item span:last-child').forEach(function(i){i.textContent='+';i.style.transform='rotate(0)';});
+  if(!isOpen){body.style.display='block';icon.textContent='−';icon.style.transform='rotate(180deg)';}
+}
+
+
+function scrollToSection(sectionId){
+  setTimeout(function(){
+    const el=document.getElementById(sectionId);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },80);
+}
+
+/* ── REVEALS ────────────────────────── */
+function observeReveals(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:.08});
+  document.querySelectorAll('.page.active .reveal').forEach(el=>{
+    el.classList.remove('visible'); io.observe(el);
+  });
+}
+
+/* ── INIT ───────────────────────────── */
+document.addEventListener('DOMContentLoaded',function(){
+  updateNavStyle('home');
+  observeReveals();
+  setTimeout(function(){
+    document.querySelectorAll('.page.active .reveal').forEach(el=>el.classList.add('visible'));
+  },300);
+});
+</script>
+</body>
+</html>
