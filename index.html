@@ -160,7 +160,7 @@ nav .logo-light { display: block !important; }
 nav .logo-dark  { display: none  !important; }
 nav.dark-nav .logo-light { display: none  !important; }
 nav.dark-nav .logo-dark  { display: block !important; }
-.nav-logo { line-height: 0; }
+.nav-logo { line-height: 0; flex-shrink:0; } .nav-logo svg { height:16px; width:auto; display:block; }
 </style>
 <style>
 /* ─── BRAND TOKENS — Souls Lab Brand Guideline 2025 ───────────────
@@ -280,12 +280,12 @@ nav.dark-nav .nav-drop .drop-label{color:rgba(235,226,217,0.22);}
 .nav-cta:hover{background:var(--fire);color:var(--depth);}
 
 /* HERO */
-.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 52px 56px;position:relative;overflow:hidden;}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 52px 56px;position:relative;overflow:hidden;box-sizing:border-box;}
 .hero-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 68% 35%,rgba(114,6,6,0.08) 0%,transparent 55%),radial-gradient(ellipse at 15% 80%,rgba(114,6,6,0.04) 0%,transparent 45%);}
 .hero-counter{position:absolute;right:52px;bottom:56px;font-family:var(--mono);font-size:10px;color:var(--dimmer);letter-spacing:.12em;writing-mode:vertical-rl;}
-.hero-h1{font-family:var(--serif);font-size:clamp(52px,8vw,132px);font-weight:400;line-height:1.0;letter-spacing:-.03em;margin-bottom:clamp(24px,3vw,48px);}
+.hero-h1{font-family:var(--serif);font-size:clamp(48px,7.5vw,118px);font-weight:400;line-height:1.05;letter-spacing:-.03em;margin-bottom:clamp(24px,3vw,48px);}
 .hero-h1 .l1{display:block;color:var(--text);}
-.hero-h1 .l2{display:block;font-style:italic;color:var(--fire);font-size:clamp(48px,7.5vw,124px);}
+.hero-h1 .l2{display:block;font-style:italic;color:var(--fire);font-size:clamp(44px,7vw,112px);}
 .hero-row{display:flex;align-items:flex-end;gap:80px;}
 .hero-desc{font-size:15px;line-height:1.76;color:var(--muted);max-width:380px;}
 .hero-actions{display:flex;gap:40px;align-items:center;flex-shrink:0;}
@@ -682,34 +682,119 @@ footer{padding:80px 52px 48px;border-top:1px solid rgba(114,6,6,0.1);background:
   .nav-cta{display:none;}
   .nav-hamburger{display:flex !important;}
 
+  /* Logo sizing */
+  .nav-logo svg{height:14px !important;width:auto !important;}
+
   /* Layout */
   .hero,.manifesto,.section,.cta-strip,footer{padding-left:24px;padding-right:24px;}
-  .hero-h1{font-size:clamp(42px,8vw,88px);}
-  .hero-h1 .l2{font-size:clamp(38px,7vw,80px);}  .hero-row{flex-direction:column;gap:28px;align-items:flex-start;}
+  .hero{padding-left:24px !important;padding-right:24px !important;}
+  .hero-h1{font-size:clamp(36px,7vw,72px);}
+  .hero-h1 .l2{font-size:clamp(32px,6.5vw,68px);}
+  .hero-row{flex-direction:column;gap:28px;align-items:flex-start;}
+  .hero-desc{max-width:100% !important;}
   .col2{grid-template-columns:1fr;gap:40px;margin-top:40px;}
   .col3,.col4{grid-template-columns:1fr;}
   .program-grid{grid-template-columns:1fr 1fr;}
   .fit-grid{grid-template-columns:1fr;}
-  .ft-grid{grid-template-columns:1fr;gap:28px;}
-  .sp-hero{padding:100px 24px 52px;}.sp-back{left:24px;top:88px;}
+
+  /* Footer — 2 cols on tablet */
+  .ft-grid{grid-template-columns:1fr 1fr !important;gap:36px 28px;}
+  .ft-grid > div:first-child{grid-column:1/-1;}
+
+  /* NDT steps */
+  .ndt-step{grid-template-columns:48px 1fr;gap:20px;padding:28px 0;}
+
+  /* Svc rows */
+  .svc{flex-wrap:wrap;}
+  .svc-l{flex-wrap:wrap;}
+  .svc-tags{flex-wrap:wrap;}
+
+  /* Stats bar */
+  .stats-bar{gap:32px;flex-wrap:wrap;}
+  .stat{min-width:140px;}
+
+  /* Col2 s-body fix */
+  .s-body{padding-top:0 !important;}
+
+  .sp-hero{padding:100px 24px 52px;}
+  .sp-back{left:24px;top:88px;}
   .pkg{padding:36px 24px;}
   .manifesto-ctas{flex-direction:column;align-items:flex-start;}
   .svc-detail-hero{padding:96px 24px 48px;}
   .included-list{margin-top:28px;}
+
+  /* Proof cards — 2 cols */
+  .col4{grid-template-columns:1fr 1fr !important;}
+
+  /* Audience cards */
+  .col3{grid-template-columns:1fr 1fr !important;}
+
+  /* Methodology section */
+  #methodology .col2{gap:32px;}
 }
 
 @media(max-width:600px){
   nav{padding:16px 20px;}
   .hero,.manifesto,.section,.cta-strip,footer{padding-left:20px;padding-right:20px;}
-  .stats-bar{flex-direction:column;}
+  .hero{padding:80px 20px 40px !important;}
+
+  /* Logo */
+  .nav-logo svg{height:16px !important;width:auto !important;}
+
+  /* Hero */
+  .stats-bar{flex-direction:column;gap:20px;}
+  .stat{width:100%;}
+  .hero-h1{font-size:clamp(28px,9vw,44px);}
+  .hero-h1 .l2{font-size:clamp(26px,8.5vw,40px);}
+  .hero-desc{font-size:14px;}
+
+  /* Grids — all single col on mobile */
   .program-grid{grid-template-columns:1fr;}
-  .hero-h1{font-size:clamp(36px,11vw,56px);}
-  .hero-h1 .l2{font-size:clamp(32px,9.5vw,50px);}
+  .col3,.col4{grid-template-columns:1fr !important;}
   .svc-cards-grid{grid-template-columns:1fr;}
   .svc-card{padding:32px 24px;}
+  .svc{padding:20px 0 !important;}
+  .svc-num{font-size:clamp(32px,8vw,48px);}
+
+  /* Footer — single col on mobile */
+  .ft-grid{grid-template-columns:1fr !important;gap:32px !important;}
+  .ft-grid > div:first-child{grid-column:auto;}
+
+  /* Buttons */
   .cta-btns{flex-direction:column;align-items:stretch;}
-  .cta-btns .btn-p,.cta-btns .btn-o{justify-content:center;}
+  .cta-btns .btn-p,.cta-btns .btn-o{justify-content:center;text-align:center;}
+
+  /* NDT steps */
+  .ndt-step{grid-template-columns:36px 1fr;gap:16px;padding:24px 0;}
+  .step-n{font-size:28px;}
+
+  /* Audience cards */
+  .aud{padding:32px 24px;}
+
+  /* Proof cards */
+  .proof-card{padding:32px 20px;}
+
+  /* Manifesto */
+  .manifesto-q{font-size:clamp(22px,7vw,40px);}
+
+  /* CTA strip */
+  .cta-h{font-size:clamp(28px,8vw,48px) !important;}
+
   .sp-hero{padding:88px 20px 40px;}
+
+  /* Section headings */
+  .s-h2{font-size:clamp(28px,8vw,48px);}
+}
+
+
+/* ── 390px — small phones ── */
+@media(max-width:390px){
+  .hero-h1{font-size:clamp(30px,12vw,44px);}
+  .hero-h1 .l2{font-size:clamp(26px,10vw,40px);}
+  .hero-desc{font-size:13px;}
+  .stats-bar .stat-n{font-size:clamp(28px,10vw,44px);}
+  .s-h2{font-size:clamp(24px,9vw,38px);}
+  .manifesto-q{font-size:clamp(20px,8vw,32px);}
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -751,16 +836,15 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
   display:none;
   position:fixed;
   inset:0;
-  background:var(--depth);
+  background:#ebe2d9;
   z-index:300;
   flex-direction:column;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
 }
-/* JS adds .open → show with animation via inline styles */
 .nav-mobile.open{ display:flex; }
 
-/* 3. Close (X) button */
+/* Close (X) button */
 .nav-mobile-close{
   position:absolute;
   top:20px; right:24px;
@@ -769,7 +853,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
   cursor:pointer;
   z-index:320;
   color:var(--text);
-  font-size:22px;
+  font-size:24px;
   font-weight:300;
   line-height:1;
   font-family:var(--sans);
@@ -778,22 +862,22 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
 }
 .nav-mobile-close:hover{ color:var(--fire); transform:rotate(90deg); }
 
-/* 4. Nav link list */
+/* Nav link list */
 .nav-mobile-body{
   display:flex;
   flex-direction:column;
   padding:80px 32px 32px;
   flex:1;
 }
-.nav-mobile-item{ border-bottom:1px solid rgba(114,6,6,0.09); }
+.nav-mobile-item{ border-bottom:1px solid rgba(114,6,6,0.1); }
 .nav-mobile-item > a{
   display:flex;
   align-items:center;
   justify-content:space-between;
   font-family:var(--serif);
-  font-size:clamp(30px,7.5vw,50px);
+  font-size:clamp(28px,8vw,52px);
   font-weight:400;
-  color:var(--text);
+  color:rgba(26,8,8,0.65);
   padding:18px 0;
   letter-spacing:-.02em;
   line-height:1.1;
@@ -805,7 +889,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
 .nav-mobile-item > a:active,
 .nav-mobile-item > a:hover{ color:var(--fire); }
 .mob-chevron{
-  font-size:20px;
+  font-size:18px;
   color:rgba(114,6,6,0.3);
   flex-shrink:0;
   margin-left:12px;
@@ -813,14 +897,14 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
   font-weight:300;
   transition:color .18s, transform .2s;
 }
-.nav-mobile-item > a:hover .mob-chevron{ color:var(--fire); transform:rotate(90deg); }
+.nav-mobile-item > a:hover .mob-chevron{ color:var(--fire); transform:translateX(4px); }
 
-/* 5. Sub-menu */
+/* Sub-menu */
 .nav-mobile-sub{
   display:none;
   flex-direction:column;
-  padding:4px 0 16px 20px;
-  border-left:2px solid rgba(114,6,6,0.1);
+  padding:4px 0 14px 20px;
+  border-left:2px solid rgba(114,6,6,0.2);
   margin-left:2px;
 }
 .nav-mobile-sub.open{ display:flex; }
@@ -829,24 +913,24 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
   font-size:9px;
   letter-spacing:.18em;
   text-transform:uppercase;
-  color:var(--dimmer);
-  padding:12px 0 4px;
+  color:rgba(114,6,6,0.4);
+  padding:10px 0 4px;
 }
 .nav-mobile-sub a{
   font-family:var(--sans);
-  font-size:15px;
-  color:var(--muted);
+  font-size:14px;
+  color:rgba(26,8,8,0.55);
   padding:9px 0;
   cursor:pointer;
-  letter-spacing:.01em;
+  letter-spacing:.02em;
   transition:color .18s;
   display:block;
   text-decoration:none;
 }
 .nav-mobile-sub a:hover{ color:var(--fire); }
 
-/* 6. Say Hello CTA at bottom */
-.nav-mobile-cta{ padding:24px 32px 52px; }
+/* Say Hello CTA at bottom */
+.nav-mobile-cta{ padding:20px 32px 52px; }
 .nav-mobile-cta .btn-p-fire{
   width:100%;
   justify-content:center;
@@ -855,7 +939,10 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
   padding:16px 32px;
 }
 
-/* 7. BREAKPOINT — show hamburger on ≤1024px */
+/* Hamburger lines — cream on dark pages */
+nav.dark-nav .nav-hamburger span{ background:var(--depth) !important; }
+
+/* BREAKPOINT — show hamburger on ≤1024px */
 @media(max-width:1024px){
   .nav-hamburger{ display:flex !important; }
   .nav-links{ display:none !important; }
@@ -864,8 +951,8 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
 }
 @media(max-width:600px){
   nav{ padding:14px 20px; }
-  .nav-mobile-body{ padding:72px 24px 28px; }
-  .nav-mobile-cta{ padding:20px 24px 44px; }
+  .nav-mobile-body{ padding:64px 20px 24px; }
+  .nav-mobile-cta{ padding:16px 20px 44px; }
   .nav-mobile-close{ right:16px; }
 }
 </style>
@@ -883,7 +970,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
 <!-- NAV -->
 <nav id="nav">
   <div class="nav-logo" onclick="goNav('home')" style="cursor:pointer;display:flex;align-items:center;">
-    <span class="logo-light"><svg width="auto" height="22" viewBox="0 0 341 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <span class="logo-light"><svg width="auto" height="16" viewBox="0 0 341 65" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M320.319 63.692C314.096 63.692 308.997 61.3586 305.541 57.5561V62.9142H298.886V2.41968H305.541V27.9138C309.084 24.1113 314.096 21.7779 320.319 21.7779C331.121 21.7779 340.455 31.1114 340.455 42.7781C340.455 54.3585 331.121 63.692 320.319 63.692ZM305.109 42.7781C305.109 50.7289 311.504 57.124 319.454 57.124C327.405 57.124 333.887 50.7289 333.887 42.7781C333.887 34.741 327.405 28.4323 319.454 28.4323C311.504 28.4323 305.109 34.741 305.109 42.7781Z" fill="#B5100A"/>
 <path d="M267.637 63.6919C256.835 63.6919 247.501 54.3584 247.501 42.7781C247.501 31.1113 256.835 21.7778 267.637 21.7778C274.119 21.7778 279.304 24.284 282.848 28.3458V22.5556H289.415V62.9141H282.848V57.1239C279.304 61.1857 274.119 63.6919 267.637 63.6919ZM254.069 42.7781C254.069 50.7288 260.551 57.1239 268.502 57.1239C276.452 57.1239 282.848 50.7288 282.848 42.7781C282.848 34.7409 276.452 28.4322 268.502 28.4322C260.551 28.4322 254.069 34.7409 254.069 42.7781Z" fill="#B5100A"/>
 <path d="M215.644 62.9142V2.41968H222.471V56.0869H244.854V62.9142H215.644Z" fill="#B5100A"/>
@@ -893,7 +980,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
 <path d="M55.8879 57.8154C52.143 53.8977 50.2705 48.7989 50.2705 42.519C50.2705 36.1814 52.143 30.9386 55.8879 26.7904C59.8056 22.4694 64.9908 20.3088 71.4436 20.3088C77.9539 20.3088 83.1104 22.3253 86.9129 26.3583C90.6578 30.276 92.5302 35.4037 92.5302 41.7412C92.5302 48.0787 90.6578 53.2927 86.9129 57.3833C83.0528 61.6467 77.8963 63.7785 71.4436 63.7785C64.9332 63.7785 59.748 61.7908 55.8879 57.8154ZM63.8386 52.5438C66.1431 58.7084 69.139 61.7908 72.8263 61.7908C75.4189 61.7908 77.5218 60.6385 79.135 58.334C80.8634 55.8566 81.7276 52.2845 81.7276 47.6178C81.7276 41.914 80.8058 36.5559 78.9622 31.5435C76.7152 25.4365 73.7193 22.3829 69.9744 22.3829C67.4394 22.3829 65.3653 23.5064 63.7521 25.7533C61.9661 28.2884 61.0731 31.8892 61.0731 36.5559C61.0731 42.2021 61.9949 47.5314 63.8386 52.5438Z" fill="#B5100A"/>
 <path d="M7.77786 59.371C3.57206 56.3751 0.979435 52.2845 0 47.0993L10.7162 44.9388C10.7162 50.1816 11.9261 54.2434 14.3458 57.1241C16.708 60.0624 20.0496 61.5315 24.3706 61.5315C27.8275 61.5315 30.5641 60.5809 32.5806 58.6797C34.5395 56.836 35.5189 54.4162 35.5189 51.4203C35.5189 45.1404 30.9098 40.0704 21.6916 36.2103C9.01656 30.8522 2.67904 23.9673 2.67904 15.5557C2.67904 10.6009 4.37865 6.76962 7.77786 4.06177C11.1771 1.35392 15.8726 0 21.8644 0C33.56 0 41.1363 4.83956 44.5931 14.5187L33.6176 16.7656C33.0991 7.14411 29.1238 2.33336 21.6916 2.33336C18.9261 2.33336 16.708 3.11115 15.0372 4.66672C13.3664 6.22229 12.531 8.3252 12.531 10.9754C12.531 13.9137 13.7985 16.5064 16.3335 18.7533C18.35 20.6545 22.0085 22.9015 27.3089 25.4941C39.4655 31.4283 45.5437 38.486 45.5437 46.6672C45.5437 52.0829 43.5848 56.3463 39.6671 59.4574C35.807 62.511 30.6217 64.0377 24.1114 64.0377C17.601 64.0377 12.1565 62.4822 7.77786 59.371Z" fill="#B5100A"/>
 </svg></span>
-    <span class="logo-dark"><svg width="auto" height="22" viewBox="0 0 554 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <span class="logo-dark"><svg width="auto" height="16" viewBox="0 0 554 105" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M520.806 103.557C510.69 103.557 502.399 99.7632 496.779 93.5807V102.292H485.959V3.93433H496.779V45.3852C502.54 39.2027 510.69 35.4089 520.806 35.4089C538.37 35.4089 553.546 50.5842 553.546 69.5532C553.546 88.3818 538.37 103.557 520.806 103.557ZM496.076 69.5532C496.076 82.4803 506.474 92.8782 519.401 92.8782C532.328 92.8782 542.867 82.4803 542.867 69.5532C542.867 56.4857 532.328 46.2283 519.401 46.2283C506.474 46.2283 496.076 56.4857 496.076 69.5532Z" fill="#EBE2D9"/>
 <path d="M435.152 103.557C417.588 103.557 402.413 88.3818 402.413 69.5532C402.413 50.5842 417.588 35.4089 435.152 35.4089C445.691 35.4089 454.121 39.4838 459.882 46.0878V36.6735H470.561V102.292H459.882V92.8782C454.121 99.4822 445.691 103.557 435.152 103.557ZM413.092 69.5532C413.092 82.4803 423.63 92.8782 436.557 92.8782C449.484 92.8782 459.882 82.4803 459.882 69.5532C459.882 56.4857 449.484 46.2283 436.557 46.2283C423.63 46.2283 413.092 56.4857 413.092 69.5532Z" fill="#EBE2D9"/>
 <path d="M350.615 102.292V3.93433H361.715V91.192H398.108V102.292H350.615Z" fill="#EBE2D9"/>
@@ -911,11 +998,9 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
     <li class="nav-item has-drop">
       <a id="nav-services">Services</a>
       <div class="nav-drop">
-        <span class="drop-label">Applied NDT</span>
-        <a id="nav-vc" onclick="goNav('vc')">Applied NDT for VCs</a>
-        <a id="nav-web3" onclick="goNav('web3')">Applied NDT for Web3 Protocols</a>
+        <a id="nav-vc" onclick="goNav('vc')">New Media for VCs</a>
+        <a id="nav-web3" onclick="goNav('web3')">New Media for Web3 Protocols</a>
         <hr>
-        <span class="drop-label">Work</span>
         <a id="nav-case-studies" onclick="goNav('case-studies')">Case Studies</a>
       </div>
     </li>
@@ -961,7 +1046,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="nav-mobile-sub" id="sub-services">
         <span class="drop-label">Applied NDT</span>
         <a onclick="goNav('vc');closeMobileNav()">New Media for VCs</a>
-        <a onclick="goNav('web3');closeMobileNav()">Applied NDT for Web3</a>
+        <a onclick="goNav('web3');closeMobileNav()">New Media for Web3 Protocols</a>
         <span class="drop-label">Work</span>
       </div>
     </div>
@@ -1184,7 +1269,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#9efdf1f0eafffdeab0edf1ebf2edf2fffcdef9f3fff7f2b0fdf1f3">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -1308,7 +1393,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#99faf6f7edf8faedb7eaf6ecf5eaf5f8fbd9fef4f8f0f5b7faf6f4">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -1404,7 +1489,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#f4979b9a80959780da879b819887989596b49399959d98da979b99">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -1612,7 +1697,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#4724282933262433693428322b342b262507202a262e2b6924282a">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -1806,13 +1891,13 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#73101c1d071210075d001c061f001f121133141e121a1f5d101c1e">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <!-- ══ SERVICE: VIETNAM MARKET ══ -->
 <div id="svc-vietnam" class="page">
   <section class="svc-detail-hero">
@@ -1868,7 +1953,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#97f4f8f9e3f6f4e3b9e4f8e2fbe4fbf6f5d7f0faf6fefbb9f4f8fa">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -1929,7 +2014,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#83e0ecedf7e2e0f7adf0ecf6eff0efe2e1c3e4eee2eaefade0ecee">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -1990,7 +2075,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#1675797862777562386579637a657a777456717b777f7a3875797b">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -2052,7 +2137,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#3b5854554f5a584f1548544e5748575a597b5c565a525715585456">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -2181,7 +2266,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#e4878b8a90858790ca978b918897888586a48389858d88ca878b89">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -2619,7 +2704,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
   </div>
 
   <!-- Twitter widget script — loads once -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   (function(){
     if(window.__twLoaded) return;
     window.__twLoaded = true;
@@ -2655,7 +2740,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#dbb8b4b5afbab8aff5a8b4aeb7a8b7bab99bbcb6bab2b7f5b8b4b6">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -2848,7 +2933,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#fc9f9392889d9f88d28f9389908f909d9ebc9b919d9590d29f9391">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -2934,7 +3019,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#10737f7e647173643e637f657c637c717250777d71797c3e737f7d">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -3009,7 +3094,7 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#33505c5d475250471d405c465f405f525173545e525a5f1d505c5e">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
@@ -3277,14 +3362,14 @@ nav.dark-nav .nav-hamburger span{ background:var(--depth); }
       <div class="ft-col"><h4>Services</h4><a onclick="goNav('vc')">New Media for VCs</a><a onclick="goNav('web3')">New Media for Web3 GTM Protocols</a><a onclick="goNav('ndt-alliance')">NDT Alliance</a></div>
       <div class="ft-col"><h4>Programs</h4><a onclick="goNav('soulsu')">SoulsU</a><a onclick="goNav('souls-voices')">Souls Creator Network</a><a onclick="goNav('souls-build')">Souls Build</a></div>
       <div class="ft-col"><h4>Company</h4><a onclick="goNav('company-about')">About</a><a onclick="goNav('case-studies')">Case Studies</a><a href="https://soulslabs.substack.com/p/introducing-narrative-design-thinking" target="_blank" rel="noopener">Manifesto</a></div>
-      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="mailto:contact.soulslab@gmail.com">Send an Email</a></div>
+      <div class="ft-col"><h4>Connect</h4><a href="https://x.com/SoulsLabs" target="_blank" rel="noopener">Twitter / X</a><a href="https://www.linkedin.com/company/souls-web3-marketing-agency/?viewAsMember=true" target="_blank" rel="noopener">LinkedIn</a><a href="https://soulslabs.substack.com/" target="_blank" rel="noopener">Substack</a><a href="/cdn-cgi/l/email-protection#2744484953464453095448524b544b464567404a464e4b0944484a">Send an Email</a></div>
     </div>
     <div class="ft-bottom"><div class="ft-copy">© 2025 Souls Lab — All rights reserved</div><div class="ft-copy">Narrative Design Thinking™</div></div>
   </footer>
 </div>
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ══════════════════════════════════════════════════════════════
    SOULS LAB — MAIN ROUTER + PAGE ENGINE
    ══════════════════════════════════════════════════════════════ */
@@ -3338,12 +3423,31 @@ function goNav(pageId) { go(pageId); }
 
 /* ── MOBILE NAV ── */
 function toggleMobileNav() {
-  var overlay = document.getElementById('nav-mobile');
-  if (overlay) overlay.classList.toggle('open');
+  var overlay = document.getElementById('mobileNav');
+  if (!overlay) overlay = document.getElementById('nav-mobile');
+  if (overlay) {
+    var hamburger = document.getElementById('hamburger');
+    overlay.classList.toggle('open');
+    if (hamburger) hamburger.classList.toggle('open');
+  }
 }
 function closeMobileNav() {
-  var overlay = document.getElementById('nav-mobile');
+  var overlay = document.getElementById('mobileNav');
+  if (!overlay) overlay = document.getElementById('nav-mobile');
   if (overlay) overlay.classList.remove('open');
+  var hamburger = document.getElementById('hamburger');
+  if (hamburger) hamburger.classList.remove('open');
+  /* also close all submenus */
+  document.querySelectorAll('.nav-mobile-sub.open').forEach(function(s){ s.classList.remove('open'); });
+}
+function toggleMobileSub(id) {
+  var sub = document.getElementById(id);
+  if (!sub) return;
+  var isOpen = sub.classList.contains('open');
+  /* close all other subs */
+  document.querySelectorAll('.nav-mobile-sub.open').forEach(function(s){ s.classList.remove('open'); });
+  /* toggle clicked one */
+  if (!isOpen) sub.classList.add('open');
 }
 
 /* ── INIT: show home on load ── */
@@ -3394,26 +3498,26 @@ function observeReveals(){
   els.forEach(function(el){io.observe(el);});
 }
 
-/* ── CASE STUDIES FILTER ─────────────────────── */
-function filterCS(btn,cat){
-  document.querySelectorAll('.cs-filter-btn').forEach(function(b){b.classList.remove('active');});
+/* ── CASE STUDIES FILTER ─────────────────── */
+function filterCS(btn, cat) {
+  document.querySelectorAll('.cs-filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   document.querySelectorAll('.cs-card').forEach(function(card){
-    if(cat==='all'||card.dataset.cat===cat){card.style.display='';}
-    else{card.style.display='none';}
+    if (cat === 'all' || card.dataset.cat === cat) { card.style.display = ''; }
+    else { card.style.display = 'none'; }
   });
 }
 
 /* ── SoulsU FAQ TOGGLE ───────────────────────── */
-function toggleFAQ(el){
-  var body=el.nextElementSibling;
-  var isOpen=body.style.display==='block';
-  document.querySelectorAll('.sb-faq-body').forEach(function(b){b.style.display='none';});
-  document.querySelectorAll('.sb-faq-item span:last-child').forEach(function(i){i.textContent='+';i.style.transform='rotate(0)';});
-  if(!isOpen){
-    body.style.display='block';
-    el.querySelector('span:last-child').textContent='−';
-    el.querySelector('span:last-child').style.transform='rotate(180deg)';
+function toggleFAQ(el) {
+  var body = el.nextElementSibling;
+  var isOpen = body.style.display === 'block';
+  document.querySelectorAll('.sb-faq-body').forEach(function(b){ b.style.display = 'none'; });
+  document.querySelectorAll('.sb-faq-item span:last-child').forEach(function(i){ i.textContent = '+'; i.style.transform = 'rotate(0)'; });
+  if (!isOpen) {
+    body.style.display = 'block';
+    el.querySelector('span:last-child').textContent = '−';
+    el.querySelector('span:last-child').style.transform = 'rotate(180deg)';
   }
 }
 
